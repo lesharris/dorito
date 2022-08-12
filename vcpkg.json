@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "hijo",
+  "version-semver": "0.0.0",
+  "dependencies": [
+    "fmt",
+    "stb",
+    "zlib",
+    "spdlog",
+    "entt",
+    "catch2",
+    "sdl2",
+    "nativefiledialog"
+  ]
+}

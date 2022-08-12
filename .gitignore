@@ -1,0 +1,9 @@
+.idea
+cmake-*/
+.DS_Store
+tools/scripts/dist
+tools/scripts/node_modules
+out/
+.vs/
+build/
+.vscode/
