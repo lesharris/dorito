@@ -1,6 +1,7 @@
 #include "UI.h"
 #include "imgui_internal.h"
 
+#include <zep.h>
 #include <nfd.h>
 
 #include "system/Bus.h"
@@ -28,6 +29,9 @@ namespace dorito {
     auto glfwWindow = glfwGetCurrentContext();
     ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true);
     ImGui_ImplOpenGL3_Init("#version 330");
+
+    m_Editor = CreateScope<Zep::ZepEditor_ImGui>("", Zep::NVec2{2.0f, 2.0f});
+    m_CodeBuffer = m_Editor->InitWithText("Code", "");
 
     EventManager::Get().Attach<
         Events::KeyPressed,
@@ -209,7 +213,7 @@ namespace dorito {
 
         ImGui::Separator();
 
-        if (ImGui::MenuItem("Warp Factor 10x", nullptr, &m_1000Cycles)) {
+        if (ImGui::MenuItem("Warp Factor 10k", nullptr, &m_10000Cycles)) {
           EventManager::Dispatcher().enqueue(Events::SetCycles(10000));
         }
 
@@ -272,26 +276,55 @@ namespace dorito {
         ImGui::EndMenu();
       }
 
+      auto drawPalette = [](const std::vector<Color> &pal) {
+        float sz = ImGui::GetTextLineHeight();
+        ImVec2 p = ImGui::GetCursorScreenPos();
+
+        for (auto i = 1; i <= 4; i++) {
+          ImGui::GetWindowDrawList()->AddRectFilled(p,
+                                                    ImVec2(p.x + sz, p.y + sz),
+                                                    IM_COL32(
+                                                        pal[i - 1].r,
+                                                        pal[i - 1].g,
+                                                        pal[i - 1].b,
+                                                        pal[i - 1].a
+                                                    ));
+
+          p.x += sz + 4.0f;
+        }
+        ImGui::Dummy(ImVec2(sz * 5, sz));
+        ImGui::SameLine();
+      };
+
+      auto &currentPallete = bus.m_Display.Palette();
+
       if (ImGui::BeginMenu("Colors")) {
 
+        drawPalette(m_GreyPalette);
         if (ImGui::MenuItem("Grayscale", nullptr, &m_PalGrey)) {
           m_PalOcto = false;
           m_PalNeat = false;
           m_PalKesh = false;
           EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_GreyPalette});
         }
+
+        drawPalette(m_NeatPalette);
         if (ImGui::MenuItem("Neatboy", nullptr, &m_PalNeat)) {
           m_PalOcto = false;
           m_PalGrey = false;
           m_PalKesh = false;
           EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_NeatPalette});
         }
+
+        drawPalette(m_OctoPalette);
         if (ImGui::MenuItem("Octo", nullptr, &m_PalOcto)) {
           m_PalGrey = false;
           m_PalNeat = false;
           m_PalKesh = false;
           EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_OctoPalette});
         }
+
+        drawPalette(m_KeshaPalette);
         if (ImGui::MenuItem("Kesha", nullptr, &m_PalKesh)) {
           m_PalOcto = false;
           m_PalNeat = false;
@@ -301,6 +334,7 @@ namespace dorito {
 
         ImGui::Separator();
 
+        drawPalette(currentPallete);
         if (ImGui::MenuItem("Set Colors...")) {
           m_ShowColorEditor = true;
           m_PalGrey = false;
@@ -309,6 +343,11 @@ namespace dorito {
           m_PalKesh = false;
         }
 
+        ImGui::EndMenu();
+      }
+
+      if (ImGui::BeginMenu("Development")) {
+        ImGui::MenuItem("Code Editor", nullptr, &m_ShowCodeEditor);
         ImGui::EndMenu();
       }
 
@@ -354,6 +393,10 @@ namespace dorito {
 
       if (m_ShowColorEditor) {
         ColorEditor();
+      }
+
+      if (m_ShowCodeEditor) {
+        CodeEditor();
       }
 
       Viewport();
@@ -876,6 +919,32 @@ namespace dorito {
         EventManager::Dispatcher().trigger<Events::SetColor>({3, color});
       }
       ImGui::EndTable();
+
+      ImGui::End();
+    }
+  }
+
+  void UI::CodeEditor() {
+    if (!ImGui::Begin("Code", &m_ShowCodeEditor)) {
+      ImGui::End();
+    } else {
+      m_Editor->SetGlobalMode("Standard");
+
+      if (ImGui::IsWindowFocused()) {
+        ImGuiIO &io = ImGui::GetIO();
+        io.WantCaptureKeyboard = true;
+        io.WantTextInput = true;
+        m_Editor->HandleInput();
+      } else {
+        m_Editor->ResetCursorTimer();
+      }
+
+      m_Editor->UpdateWindowState();
+
+      m_Editor->SetDisplayRegion(Zep::toNVec2f(ImGui::GetCursorScreenPos()),
+                                 Zep::toNVec2f(ImGui::GetContentRegionAvail()) +
+                                 Zep::toNVec2f(ImGui::GetCursorScreenPos()));
+      m_Editor->Display();
 
       ImGui::End();
     }

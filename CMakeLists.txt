@@ -33,6 +33,25 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
   endif ()
 endif ()
 
+find_package(zep QUIET)
+if (NOT zep_FOUND)
+  include(FetchContent)
+  FetchContent_Declare(
+      zep
+      URL https://github.com/Rezonality/zep/archive/refs/heads/master.zip
+  )
+  FetchContent_GetProperties(zep)
+  if (NOT zep_POPULATED)
+    set(FETCHCONTENT_QUIET NO)
+    FetchContent_Populate(zep)
+    set(BUILD_IMGUI ON CACHE BOOL "" FORCE)
+    set(BUILD_DEMOS OFF CACHE BOOL "" FORCE)
+    set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(BUILD_EXTENSIONS OFF CACHE BOOL "" FORCE)
+    add_subdirectory(${zep_SOURCE_DIR} ${zep_BINARY_DIR})
+  endif ()
+endif ()
+
 find_path(STB_INCLUDE_DIRS "stb_c_lexer.h")
 
 find_package(fmt CONFIG REQUIRED)
@@ -104,7 +123,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${STB_INCLUDE_DIRS}
     ${PROJECT_SOURCE_DIR}/src/external
     ${PROJECT_SOURCE_DIR}/src/external/imgui
-    ${PROJECT_SOURCE_DIR}/src/external/imgui/backends)
+    ${PROJECT_SOURCE_DIR}/src/external/imgui/backends
+    ${zep_SOURCE_DIR}/include)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     fmt::fmt
@@ -114,6 +134,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     EnTT::EnTT
     SDL2::SDL2-static
     unofficial::nativefiledialog::nfd
+    Zep::Zep
     )
 
 if (APPLE)

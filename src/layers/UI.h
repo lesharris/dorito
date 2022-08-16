@@ -1,6 +1,7 @@
 #pragma once
 
 #include <raylib.h>
+#include <zep.h>
 #include <vector>
 
 #include "common/common.h"
@@ -45,6 +46,8 @@ namespace dorito {
 
     void ColorEditor();
 
+    void CodeEditor();
+
   private:
     ImVec2 GetLargestSizeForViewport();
 
@@ -61,6 +64,7 @@ namespace dorito {
     bool m_ShowDisassembly = true;
     bool m_ShowAudio = true;
     bool m_ShowColorEditor = false;
+    bool m_ShowCodeEditor = true;
 
     bool m_7Cycles = false;
     bool m_15Cycles = false;
@@ -70,6 +74,7 @@ namespace dorito {
     bool m_200Cycles = false;
     bool m_500Cycles = false;
     bool m_1000Cycles = false;
+    bool m_10000Cycles = false;
 
     bool m_ShiftQuirk = false;
     bool m_LoadStoreQuirk = false;
@@ -124,6 +129,9 @@ namespace dorito {
     int32_t m_PrevScreenHeight;
 
     uint16_t m_PrevPC = 0;
+
+    Scope<Zep::ZepEditor_ImGui> m_Editor;
+    Zep::ZepBuffer *m_CodeBuffer;
   };
 
 } // dorito
