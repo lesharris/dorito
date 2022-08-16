@@ -8,7 +8,7 @@ endif ()
 
 project(
     dorito
-    VERSION 0.0.1
+    VERSION 0.5.0
     HOMEPAGE_URL https://lesharris.com/dorito
     LANGUAGES C CXX
 )
@@ -17,18 +17,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 set(CMAKE_CXX_STANDARD 20)
 
 # Dependencies
+
+# Fetch deps
 find_package(raylib 4.2.0 QUIET)
-if (NOT raylib_FOUND) # If there's none, fetch and build raylib
+if (NOT raylib_FOUND)
   include(FetchContent)
   FetchContent_Declare(
       raylib
       URL https://github.com/raysan5/raylib/archive/refs/tags/4.2.0.zip
   )
   FetchContent_GetProperties(raylib)
-  if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
+  if (NOT raylib_POPULATED)
     set(FETCHCONTENT_QUIET NO)
     FetchContent_Populate(raylib)
-    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build the supplied examples
+    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
   endif ()
 endif ()
@@ -52,16 +54,14 @@ if (NOT zep_FOUND)
   endif ()
 endif ()
 
-find_path(STB_INCLUDE_DIRS "stb_c_lexer.h")
-
+# vcpkg deps
 find_package(fmt CONFIG REQUIRED)
-find_package(ZLIB REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
-find_package(SDL2 CONFIG REQUIRED)
 find_package(unofficial-nativefiledialog CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
-# Our App!
+# Dorito 🎉
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/core/Dorito.cpp
@@ -102,7 +102,7 @@ add_executable(${PROJECT_NAME}
     src/external/zep/ZepEditor.cpp
     src/external/zep/ZepEditor.h
     src/external/zep/mode_repl.cpp
-    src/external/zep/mode_repl.h)
+    src/external/zep/mode_repl.h src/common/GamePrefs.cpp src/common/GamePrefs.h)
 
 # Compile Options
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
@@ -124,7 +124,6 @@ configure_file("src/common/config.h.in" "src/common/config.h")
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_BINARY_DIR}/src/common
-    ${STB_INCLUDE_DIRS}
     ${PROJECT_SOURCE_DIR}/src/external
     ${PROJECT_SOURCE_DIR}/src/external/imgui
     ${PROJECT_SOURCE_DIR}/src/external/imgui/backends
@@ -133,13 +132,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE
     fmt::fmt
     raylib
-    ZLIB::ZLIB
     spdlog::spdlog
     EnTT::EnTT
-    SDL2::SDL2-static
     unofficial::nativefiledialog::nfd
-    Zep::Zep
-    )
+    nlohmann_json::nlohmann_json
+    Zep::Zep)
 
 if (APPLE)
   target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit")

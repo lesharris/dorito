@@ -11,6 +11,8 @@
 #include "cpu/Memory.h"
 #include "display/Display.h"
 
+#include "common/GamePrefs.h"
+
 namespace dorito {
 
   class Bus {
@@ -136,6 +138,10 @@ namespace dorito {
   private:
     void SetCompatProfile(const CompatProfile &profile);
 
+    void SaveGamePrefs();
+
+    void LoadGamePrefs();
+
   private:
     void HandleLoadRom(const Events::LoadROM &event);
 
@@ -163,6 +169,8 @@ namespace dorito {
 
     void HandleSetQuirk(const Events::SetQuirk &event);
 
+    void HandleSavePrefs(const Events::SavePrefs &event);
+
   private:
     friend class UI;
 
@@ -178,7 +186,7 @@ namespace dorito {
     CompatProfile m_CompatProfile = CompatProfile::XOChip;
 
     std::string m_RomPath;
-
+    GamePrefs m_GamePrefs;
 
     AudioStream m_Sound;
   };

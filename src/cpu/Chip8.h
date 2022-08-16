@@ -40,7 +40,7 @@ namespace dorito {
       uint8_t st;
       uint8_t dt;
 
-      // Audio Pitch Bias
+      // Audio Pitch Frequency
       double pitch;
 
       // Keys

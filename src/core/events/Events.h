@@ -195,4 +195,8 @@ namespace dorito::Events {
 
     std::vector<Color> palette;
   };
+
+  struct SavePrefs : public Event {
+    SavePrefs() : Event() {}
+  };
 }

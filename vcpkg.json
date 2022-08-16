@@ -4,11 +4,10 @@
   "version-semver": "0.0.0",
   "dependencies": [
     "fmt",
-    "stb",
-    "zlib",
     "spdlog",
     "entt",
     "catch2",
-    "nativefiledialog"
+    "nativefiledialog",
+    "nlohmann-json"
   ]
 }

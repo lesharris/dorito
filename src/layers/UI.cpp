@@ -138,6 +138,9 @@ namespace dorito {
       if (ImGui::BeginMenu("File")) {
         if (ImGui::MenuItem("Open ROM...", nullptr)) {
           nfdchar_t *outPath = nullptr;
+
+          EventManager::Dispatcher().trigger<Events::Reset>({});
+
           nfdresult_t result = NFD_OpenDialog("ch8,c8", nullptr, &outPath);
 
           switch (result) {
@@ -179,40 +182,49 @@ namespace dorito {
       if (ImGui::BeginMenu("Speed")) {
         if (ImGui::MenuItem("7 Cycles/Frame", nullptr, &m_7Cycles)) {
           EventManager::Dispatcher().enqueue(Events::SetCycles(7));
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         if (ImGui::MenuItem("15 Cycles/Frame", nullptr, &m_15Cycles)) {
           EventManager::Dispatcher().enqueue(Events::SetCycles(15));
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         if (ImGui::MenuItem("20 Cycles/Frame", nullptr, &m_20Cycles)) {
           EventManager::Dispatcher().enqueue(Events::SetCycles(20));
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         if (ImGui::MenuItem("30 Cycles/Frame", nullptr, &m_30Cycles)) {
           EventManager::Dispatcher().enqueue(Events::SetCycles(30));
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         if (ImGui::MenuItem("100 Cycles/Frame", nullptr, &m_100Cycles)) {
           EventManager::Dispatcher().enqueue(Events::SetCycles(100));
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         if (ImGui::MenuItem("200 Cycles/Frame", nullptr, &m_200Cycles)) {
           EventManager::Dispatcher().enqueue(Events::SetCycles(200));
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         if (ImGui::MenuItem("500 Cycles/Frame", nullptr, &m_500Cycles)) {
           EventManager::Dispatcher().enqueue(Events::SetCycles(500));
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         if (ImGui::MenuItem("1000 Cycles/Frame", nullptr, &m_1000Cycles)) {
           EventManager::Dispatcher().enqueue(Events::SetCycles(1000));
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         ImGui::Separator();
 
         if (ImGui::MenuItem("Warp Factor 10k", nullptr, &m_10000Cycles)) {
           EventManager::Dispatcher().enqueue(Events::SetCycles(10000));
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         ImGui::EndMenu();
@@ -221,52 +233,63 @@ namespace dorito {
       if (ImGui::BeginMenu("Compatibility")) {
         if (ImGui::MenuItem("VIP", nullptr, &m_VIPMode)) {
           EventManager::Dispatcher().enqueue<Events::VIPCompat>({});
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
         if (ImGui::MenuItem("SCHIP", nullptr, &m_SCHIPMode)) {
           EventManager::Dispatcher().enqueue<Events::SCHIPCompat>({});
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
         if (ImGui::MenuItem("XO-Chip", nullptr, &m_XOMode)) {
           EventManager::Dispatcher().enqueue<Events::XOCompat>({});
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
         ImGui::Separator();
 
         if (ImGui::BeginMenu("Quirks")) {
           if (ImGui::MenuItem("<<= and >>= modify vx in place and ignore vy", nullptr, &m_ShiftQuirk)) {
             EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Shift, m_ShiftQuirk});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
           if (ImGui::MenuItem("load and store operations leave i unchanged", nullptr, &m_LoadStoreQuirk)) {
             EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::LoadStore, m_LoadStoreQuirk});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
           if (ImGui::MenuItem("4 high bits of target address determines the offset register of jump0 instead of v0.",
                               nullptr, &m_JumpQuirk)) {
             EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Jump, m_JumpQuirk});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
           if (ImGui::MenuItem("clear vF after vx |= vy, vx &= vy, and vx ^= vy",
                               nullptr, &m_LogicQuirk)) {
             EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Logic, m_LogicQuirk});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
           if (ImGui::MenuItem("clip sprites at screen edges instead of wrapping",
                               nullptr, &m_ClipQuirk)) {
             EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Clip, m_ClipQuirk});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
           if (ImGui::MenuItem("render sprites only in vblank",
                               nullptr, &m_VBlankQuirk)) {
             EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::VBlank, m_VBlankQuirk});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
           if (ImGui::MenuItem("render height 0 sprites as 8x16 sprites in lores mode",
                               nullptr, &m_LoresQuirk)) {
             EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::LoresSprites, m_LoresQuirk});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
           if (ImGui::MenuItem("set carry if I overflows, clear otherwise",
                               nullptr, &m_IRegCarryQuirk)) {
             EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::IRegCarry, m_IRegCarryQuirk});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
           ImGui::EndMenu();
@@ -304,6 +327,7 @@ namespace dorito {
           m_PalNeat = false;
           m_PalKesh = false;
           EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_GreyPalette});
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         drawPalette(m_NeatPalette);
@@ -312,6 +336,7 @@ namespace dorito {
           m_PalGrey = false;
           m_PalKesh = false;
           EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_NeatPalette});
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         drawPalette(m_OctoPalette);
@@ -320,6 +345,7 @@ namespace dorito {
           m_PalNeat = false;
           m_PalKesh = false;
           EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_OctoPalette});
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         drawPalette(m_KeshaPalette);
@@ -328,6 +354,7 @@ namespace dorito {
           m_PalNeat = false;
           m_PalGrey = false;
           EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_KeshaPalette});
+          EventManager::Dispatcher().enqueue(Events::SavePrefs());
         }
 
         ImGui::Separator();
@@ -897,24 +924,28 @@ namespace dorito {
       if (ImGui::ColorPicker3("##bgcolor", (float *) &bgColor, ImGuiColorEditFlags_NoSmallPreview)) {
         auto color = ImvecToColor(bgColor);
         EventManager::Dispatcher().trigger<Events::SetColor>({0, color});
+        EventManager::Dispatcher().enqueue(Events::SavePrefs());
       }
 
       ImGui::TableSetColumnIndex(1);
       if (ImGui::ColorPicker3("##fc1color", (float *) &fc1Color, ImGuiColorEditFlags_NoSmallPreview)) {
         auto color = ImvecToColor(fc1Color);
         EventManager::Dispatcher().trigger<Events::SetColor>({1, color});
+        EventManager::Dispatcher().enqueue(Events::SavePrefs());
       }
 
       ImGui::TableSetColumnIndex(2);
       if (ImGui::ColorPicker3("##fc2color", (float *) &fc2Color, ImGuiColorEditFlags_NoSmallPreview)) {
         auto color = ImvecToColor(fc2Color);
         EventManager::Dispatcher().trigger<Events::SetColor>({2, color});
+        EventManager::Dispatcher().enqueue(Events::SavePrefs());
       }
 
       ImGui::TableSetColumnIndex(3);
       if (ImGui::ColorPicker3("##blcolor", (float *) &blColor, ImGuiColorEditFlags_NoSmallPreview)) {
         auto color = ImvecToColor(blColor);
         EventManager::Dispatcher().trigger<Events::SetColor>({3, color});
+        EventManager::Dispatcher().enqueue(Events::SavePrefs());
       }
       ImGui::EndTable();
 

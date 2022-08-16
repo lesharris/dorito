@@ -68,6 +68,11 @@ namespace dorito {
         &Bus::HandleSetQuirk
     >(this);
 
+    EventManager::Get().Attach<
+        Events::SavePrefs,
+        &Bus::HandleSavePrefs
+    >(this);
+
     m_Sound = LoadAudioStream(44100, 32, 1);
     SetAudioStreamCallback(m_Sound, &Bus::AudioCallback);
     AttachAudioStreamProcessor(m_Sound, &Bus::LowpassFilterCallback);
@@ -129,6 +134,7 @@ namespace dorito {
     m_RomPath = path;
 
     m_Ram.LoadRom(path);
+
     m_Cpu.Reset();
     m_Display.Reset();
     SetCompatProfile(m_CompatProfile);
@@ -136,6 +142,8 @@ namespace dorito {
     m_UseBeepBuffer = true;
 
     m_Running = false;
+
+    LoadGamePrefs();
   }
 
   void Bus::TickTimers() {
@@ -467,6 +475,10 @@ namespace dorito {
     SetCompatProfile(CompatProfile::XOChip);
   }
 
+  void Bus::HandleSavePrefs(const Events::SavePrefs &) {
+    SaveGamePrefs();
+  }
+
   void Bus::SetQuirk(Chip8::Quirk quirk, bool isSet) {
     m_Cpu.SetQuirks({quirk}, isSet);
   }
@@ -531,6 +543,52 @@ namespace dorito {
       low[1] += k * (r - low[1]);
       ((float *) buffer)[i] = low[0];
       ((float *) buffer)[i + 1] = low[1];
+    }
+  }
+
+  void Bus::LoadGamePrefs() {
+    if (m_RomPath.empty())
+      return;
+
+    auto prefsPath = fmt::format("{}.prefs", m_RomPath);
+    auto prefs = LoadFileText(prefsPath.c_str());
+
+    if (prefs) {
+      m_GamePrefs = nlohmann::json::parse(prefs);
+
+      uint8_t n = 0;
+      for (const auto &q: m_GamePrefs.quirks) {
+        m_Cpu.regs.quirks[n++] = q;
+      }
+
+      m_CyclesPerFrame = m_GamePrefs.cyclesPerFrame;
+
+      EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_GamePrefs.palette});
+
+      UnloadFileText(prefs);
+    }
+  }
+
+  void Bus::SaveGamePrefs() {
+    if (m_RomPath.empty())
+      return;
+
+    m_GamePrefs.cyclesPerFrame = m_CyclesPerFrame;
+    m_GamePrefs.palette = m_Display.Palette();
+
+    std::vector<bool> qvec;
+    for (auto q: m_Cpu.regs.quirks) {
+      qvec.push_back(q);
+    }
+
+    m_GamePrefs.quirks = qvec;
+
+    json prefs = m_GamePrefs;
+
+    auto prefsPath = fmt::format("{}.prefs", m_RomPath);
+
+    if (!SaveFileText(prefsPath.c_str(), (char *) to_string(prefs).c_str())) {
+      spdlog::get("console")->warn("Could not save game preferences at {}", prefsPath);
     }
   }
 
