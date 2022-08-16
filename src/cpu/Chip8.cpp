@@ -450,6 +450,7 @@ namespace dorito {
     m_Waiting = false;
     m_HighRes = false;
     m_KeyPressRegister = 0;
+    m_PitchDirty = false;
 
     m_CurrentInstruction = nullptr;
 
