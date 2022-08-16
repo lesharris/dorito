@@ -9,32 +9,28 @@
 #include "core/input/InputActions.h"
 #include "core/input/Keys.h"
 
+#include "cpu/Chip8.h"
+
 namespace dorito::Events {
   struct KeyPressed : public Event {
-    KeyPressed(int key = -1) : Event(), key(key) {};
+    explicit KeyPressed(int key = -1) : Event(), key(key) {};
 
     int key;
   };
 
   struct KeyReleased : public Event {
-    KeyReleased(int key = -1) : Event(), key(key) {};
+    explicit KeyReleased(int key = -1) : Event(), key(key) {};
     int key;
   };
 
   struct KeyDown : public Event {
-    KeyDown(int key = -1) : Event(), key(key) {};
+    explicit KeyDown(int key = -1) : Event(), key(key) {};
     int key;
   };
 
   struct KeyUp : public Event {
-    KeyUp(int key = -1) : Event(), key(key) {};
+    explicit KeyUp(int key = -1) : Event(), key(key) {};
     int key;
-  };
-
-  struct WindowResized : public Event {
-    WindowResized(int width = 0, int height = 0) : Event(), width(width), height(height) {};
-    int width;
-    int height;
   };
 
   struct MouseMove : public Event {
@@ -146,5 +142,57 @@ namespace dorito::Events {
 
   struct Reset : public Event {
     Reset() : Event() {}
+  };
+
+  struct StackUnderflow : public Event {
+    StackUnderflow() : Event() {}
+  };
+
+  struct OutOfRangeMemAccess : public Event {
+    explicit OutOfRangeMemAccess(uint16_t addr) : Event(), addr(addr) {}
+
+    uint16_t addr;
+  };
+
+  struct StopBeep : public Event {
+    StopBeep() : Event() {}
+  };
+
+  struct SetCycles : public Event {
+    explicit SetCycles(uint16_t cycles) : Event(), cycles(cycles) {}
+
+    uint16_t cycles;
+  };
+
+  struct VIPCompat : public Event {
+    VIPCompat() : Event() {}
+  };
+
+  struct SCHIPCompat : public Event {
+    SCHIPCompat() : Event() {}
+  };
+
+  struct XOCompat : public Event {
+    XOCompat() : Event() {}
+  };
+
+  struct SetQuirk : public Event {
+    SetQuirk(Chip8::Quirk quirk, bool value) : Event(), quirk(quirk), value(value) {}
+
+    Chip8::Quirk quirk;
+    bool value;
+  };
+
+  struct SetColor : public Event {
+    SetColor(uint8_t index, Color color) : Event(), index(index), color(color) {}
+
+    uint8_t index;
+    Color color;
+  };
+
+  struct SetPalette : public Event {
+    explicit SetPalette(const std::vector<Color> &palette) : Event(), palette(palette) {}
+
+    std::vector<Color> palette;
   };
 }

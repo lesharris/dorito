@@ -22,7 +22,7 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
   include(FetchContent)
   FetchContent_Declare(
       raylib
-      URL https://github.com/raysan5/raylib/archive/refs/heads/master.zip
+      URL https://github.com/raysan5/raylib/archive/refs/tags/4.2.0.zip
   )
   FetchContent_GetProperties(raylib)
   if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
@@ -71,7 +71,15 @@ add_executable(${PROJECT_NAME}
     src/external/imgui/imgui_widgets.cpp
     src/external/imgui/imgui.cpp
     src/external/imgui_extra/imgui_memory_editor.h
-    src/common/common.cpp)
+    src/common/common.cpp
+    src/cpu/Chip8.cpp
+    src/cpu/Chip8.h
+    src/cpu/Memory.cpp
+    src/cpu/Memory.h
+    src/system/Bus.cpp
+    src/system/Bus.h
+    src/display/Display.cpp
+    src/display/Display.h)
 
 # Compile Options
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)

@@ -9,8 +9,6 @@
 #include "layers/Emu.h"
 #include "layers/UI.h"
 
-#include <SDL.h>
-
 namespace dorito {
   void Dorito::Run() {
     if (!m_GameLayers)
@@ -37,6 +35,15 @@ namespace dorito {
       for (const auto &layer: *m_GameLayers) {
         layer->Update(m_Timestep);
       }
+
+      BeginTextureMode(m_RenderTexture);
+      ClearBackground(m_DefaultBackground);
+      for (auto layer: *m_GameLayers) {
+        if (layer->RenderTarget()) {
+          layer->Render();
+        }
+      }
+      EndTextureMode();
 
       BeginDrawing();
 
@@ -75,7 +82,7 @@ namespace dorito {
 
     SetExitKey(0);
 
-    SetTargetFPS(62);
+    SetTargetFPS(60);
 
     while (!IsWindowReady());
     m_Camera.target = {0, 0};
@@ -85,13 +92,13 @@ namespace dorito {
 
     m_GameLayers = new GameLayerStack();
 
-    float aspect = 4.0f / 3.0f;
+    float aspect = 2.0f / 1.0f;
     m_ScreenWidth = static_cast<int32_t>(m_ScreenHeight * aspect);
 
     m_RenderTexture = LoadRenderTexture(m_ScreenWidth, m_ScreenHeight);
     SetTextureFilter(m_RenderTexture.texture, TEXTURE_FILTER_POINT);
 
-    SDL_Init(SDL_INIT_AUDIO);
+    InitAudioDevice();
 
     EventManager::Get().Attach<
         Events::ViewportResized,
@@ -121,7 +128,7 @@ namespace dorito {
 
     UnloadRenderTexture(m_RenderTexture);
 
-    SDL_Quit();
+    CloseAudioDevice();
     CloseWindow();
   }
 
@@ -169,7 +176,7 @@ namespace dorito {
     m_ViewportSize.x = event.x;
     m_ViewportSize.y = event.y;
 
-    float aspect = 4.0f / 3.0f;
+    float aspect = 2.0f / 1.0f;
 
     m_ScreenWidth = static_cast<int32_t>(event.y * aspect);
     m_ScreenHeight = event.y;
@@ -191,6 +198,10 @@ namespace dorito {
   void Dorito::HandleVBlank(const Events::VBlank &) {
     BeginTextureMode(m_RenderTexture);
     ClearBackground(m_DefaultBackground);
+
+    if (!m_GameLayers)
+      return;
+
     for (auto layer: *m_GameLayers) {
       if (layer->RenderTarget()) {
         layer->Render();

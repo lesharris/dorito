@@ -6,6 +6,8 @@
 #include "core/events/EventManager.h"
 #include "core/layers/GameLayer.h"
 
+#include "system/Bus.h"
+
 namespace dorito {
 
   class Emu : public GameLayer {
@@ -23,7 +25,7 @@ namespace dorito {
 
     void RenderTexture() override;
 
-    std::string Name() const noexcept override;
+    [[nodiscard]] std::string Name() const noexcept override;
 
     bool RenderTarget() override { return true; }
 
