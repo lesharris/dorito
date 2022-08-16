@@ -116,6 +116,7 @@ namespace dorito {
     m_200Cycles = cycles == 200;
     m_500Cycles = cycles == 500;
     m_1000Cycles = cycles == 1000;
+    m_10000Cycles = cycles == 10000;
 
     auto quirks = bus.Quirks();
 
@@ -137,7 +138,7 @@ namespace dorito {
       if (ImGui::BeginMenu("File")) {
         if (ImGui::MenuItem("Open ROM...", nullptr)) {
           nfdchar_t *outPath = nullptr;
-          nfdresult_t result = NFD_OpenDialog(nullptr, nullptr, &outPath);
+          nfdresult_t result = NFD_OpenDialog("ch8,c8", nullptr, &outPath);
 
           switch (result) {
             case NFD_OKAY: {

@@ -153,7 +153,7 @@ namespace dorito {
 
     void HandleKeyUp(const Events::KeyUp &event);
 
-    void HandleKeyPressed(const Events::KeyPressed &event);
+    void HandleKeyReleased(const Events::KeyReleased &event);
 
     void HandleVIPCompat(const Events::VIPCompat &event);
 

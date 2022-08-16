@@ -44,8 +44,8 @@ namespace dorito {
     >(this);
 
     EventManager::Get().Attach<
-        Events::KeyPressed,
-        &Bus::HandleKeyPressed
+        Events::KeyReleased,
+        &Bus::HandleKeyReleased
     >(this);
 
     EventManager::Get().Attach<
@@ -339,7 +339,7 @@ namespace dorito {
     }
   }
 
-  void Bus::HandleKeyPressed(const Events::KeyPressed &event) {
+  void Bus::HandleKeyReleased(const Events::KeyReleased &event) {
     int8_t index = -1;
 
     switch (event.key) {
@@ -524,7 +524,7 @@ namespace dorito {
     static const float cutoff = 18000.0f / 44100.0f;
     float c = std::cosf(2 * pi * cutoff);
     const float k = c - 1 + std::sqrtf(c * c - 4 * c + 3);
-    
+
     for (unsigned int i = 0; i < frames * 2; i += 2) {
       float l = ((float *) buffer)[i], r = ((float *) buffer)[i + 1];
       low[0] += k * (l - low[0]);
