@@ -70,9 +70,12 @@ namespace dorito {
 
     m_Sound = LoadAudioStream(44100, 32, 1);
     SetAudioStreamCallback(m_Sound, &Bus::AudioCallback);
+    AttachAudioStreamProcessor(m_Sound, &Bus::LowpassFilterCallback);
+    SetAudioStreamVolume(m_Sound, 1.0f);
   }
 
   Bus::~Bus() {
+    DetachAudioStreamProcessor(m_Sound, &Bus::LowpassFilterCallback);
     UnloadAudioStream(m_Sound);
     EventManager::Get().DetachAll(this);
   }
@@ -102,7 +105,7 @@ namespace dorito {
       m_Cpu.Tick(m_CyclesPerFrame);
 
       if (m_Cpu.m_PitchDirty) {
-        SetAudioStreamPitch(m_Sound, m_Cpu.regs.pitch);
+        SetAudioStreamPitch(m_Sound, m_Cpu.regs.pitch / 4000.0f);
         m_Cpu.m_PitchDirty = false;
       }
 
@@ -473,6 +476,7 @@ namespace dorito {
   }
 
   void Bus::AudioCallback(void *buffer, uint32_t frames) {
+    spdlog::get("console")->info("callback {}", frames);
     static uint32_t cursor = 0;
     std::vector<float> bits;
 
@@ -512,6 +516,22 @@ namespace dorito {
     for (uint32_t i = 0; i < frames; i++) {
       output[i] = bits[cursor++];
       cursor %= 512;
+    }
+  }
+
+  void Bus::LowpassFilterCallback(void *buffer, uint32_t frames) {
+    static float low[2] = {0.0f, 0.0f};
+    const float pi = 3.14159265358979323846f;
+    static const float cutoff = 18000.0f / 44100.0f;
+    float c = std::cosf(2 * pi * cutoff);
+    const float k = c - 1 + std::sqrtf(c * c - 4 * c + 3);
+
+    for (unsigned int i = 0; i < frames * 2; i += 2) {
+      float l = ((float *) buffer)[i], r = ((float *) buffer)[i + 1];
+      low[0] += k * (l - low[0]);
+      low[1] += k * (r - low[1]);
+      ((float *) buffer)[i] = low[0];
+      ((float *) buffer)[i + 1] = low[1];
     }
   }
 

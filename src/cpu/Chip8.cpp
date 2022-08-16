@@ -1139,7 +1139,6 @@ namespace dorito {
     }
 
     regs.v[0xF] = collided;
-
   }
 
   /* EX9E */
@@ -1255,6 +1254,8 @@ namespace dorito {
   /* FX3A */
   void Chip8::ProcPitch() {
     auto &bus = Bus::Get();
+
+    // This is pretty much just voodoo to me... wish the spec went into more details.
     regs.pitch = 4000.0 * std::pow(2.0, (regs.v[mOperands[0].value] - 64.0) / 48.0);
     m_PitchDirty = true;
     bus.UseBeepBuffer(false);
@@ -1350,6 +1351,13 @@ namespace dorito {
     stream.close();
   }
 
+  /* Handling for VBlank sprite rendering is pretty much copied
+   * straight from Timendus' excellent silicon8.
+   * https://github.com/Timendus/silicon8
+   *
+   * Thanks to Timendus for his test rom which showed the problem
+   * to begin with as well.
+   */
   bool Chip8::WaitForInterrupt() {
     if (!QuirkSet(Quirk::VBlank)) {
       return false;

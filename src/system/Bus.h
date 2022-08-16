@@ -57,7 +57,10 @@ namespace dorito {
 
     void SetHighRes(bool isSet) {
       m_Display.HighRes(isSet);
+      auto mask = m_Display.PlaneMask();
+      m_Display.PlaneMask(0x3);
       m_Display.Clear();
+      m_Display.PlaneMask(mask);
     }
 
     bool Plot(uint8_t plane, uint8_t x, uint8_t y) {
@@ -128,6 +131,8 @@ namespace dorito {
   private:
     static void AudioCallback(void *buffer, uint32_t frames);
 
+    static void LowpassFilterCallback(void *buffer, uint32_t frames);
+
   private:
     void SetCompatProfile(const CompatProfile &profile);
 
@@ -153,7 +158,7 @@ namespace dorito {
     void HandleVIPCompat(const Events::VIPCompat &event);
 
     void HandleSCHIPCompat(const Events::SCHIPCompat &event);
-    
+
     void HandleXOCompat(const Events::XOCompat &event);
 
     void HandleSetQuirk(const Events::SetQuirk &event);
