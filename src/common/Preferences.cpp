@@ -1,4 +1,4 @@
-#include "GamePrefs.h"
+#include "Preferences.h"
 
 void to_json(json &j, const Color &c) {
   j = json{{"r", c.r},
@@ -15,6 +15,14 @@ void from_json(const json &j, Color &c) {
 }
 
 namespace dorito {
+  void to_json(json &j, const DoritoPrefs &dp) {
+    j = json{{"isMuted", dp.isMuted}};
+  }
+
+  void from_json(const json &j, DoritoPrefs &dp) {
+    j.at("isMuted").get_to(dp.isMuted);
+  }
+
   void to_json(json &j, const GamePrefs &gp) {
     j = json{{"cyclesPerFrame", gp.cyclesPerFrame},
              {"quirks",         gp.quirks},

@@ -179,193 +179,204 @@ namespace dorito {
         ImGui::EndMenu();
       }
 
-      if (ImGui::BeginMenu("Speed")) {
-        if (ImGui::MenuItem("7 Cycles/Frame", nullptr, &m_7Cycles)) {
-          EventManager::Dispatcher().enqueue(Events::SetCycles(7));
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
+      m_DoritoMuted = bus.m_Muted;
 
-        if (ImGui::MenuItem("15 Cycles/Frame", nullptr, &m_15Cycles)) {
-          EventManager::Dispatcher().enqueue(Events::SetCycles(15));
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
-
-        if (ImGui::MenuItem("20 Cycles/Frame", nullptr, &m_20Cycles)) {
-          EventManager::Dispatcher().enqueue(Events::SetCycles(20));
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
-
-        if (ImGui::MenuItem("30 Cycles/Frame", nullptr, &m_30Cycles)) {
-          EventManager::Dispatcher().enqueue(Events::SetCycles(30));
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
-
-        if (ImGui::MenuItem("100 Cycles/Frame", nullptr, &m_100Cycles)) {
-          EventManager::Dispatcher().enqueue(Events::SetCycles(100));
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
-
-        if (ImGui::MenuItem("200 Cycles/Frame", nullptr, &m_200Cycles)) {
-          EventManager::Dispatcher().enqueue(Events::SetCycles(200));
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
-
-        if (ImGui::MenuItem("500 Cycles/Frame", nullptr, &m_500Cycles)) {
-          EventManager::Dispatcher().enqueue(Events::SetCycles(500));
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
-
-        if (ImGui::MenuItem("1000 Cycles/Frame", nullptr, &m_1000Cycles)) {
-          EventManager::Dispatcher().enqueue(Events::SetCycles(1000));
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
+      if (ImGui::BeginMenu("Edit")) {
+        if (ImGui::MenuItem("Mute Dorito", nullptr, &m_DoritoMuted)) {
+          EventManager::Dispatcher().enqueue(Events::SetMute(m_DoritoMuted));
         }
 
         ImGui::Separator();
-
-        if (ImGui::MenuItem("Warp Factor 10k", nullptr, &m_10000Cycles)) {
-          EventManager::Dispatcher().enqueue(Events::SetCycles(10000));
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
-
-        ImGui::EndMenu();
-      }
-
-      if (ImGui::BeginMenu("Compatibility")) {
-        if (ImGui::MenuItem("VIP", nullptr, &m_VIPMode)) {
-          EventManager::Dispatcher().enqueue<Events::VIPCompat>({});
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
-        if (ImGui::MenuItem("SCHIP", nullptr, &m_SCHIPMode)) {
-          EventManager::Dispatcher().enqueue<Events::SCHIPCompat>({});
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
-        if (ImGui::MenuItem("XO-Chip", nullptr, &m_XOMode)) {
-          EventManager::Dispatcher().enqueue<Events::XOCompat>({});
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
-        ImGui::Separator();
-
-        if (ImGui::BeginMenu("Quirks")) {
-          if (ImGui::MenuItem("<<= and >>= modify vx in place and ignore vy", nullptr, &m_ShiftQuirk)) {
-            EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Shift, m_ShiftQuirk});
+        if (ImGui::BeginMenu("Speed")) {
+          if (ImGui::MenuItem("7 Cycles/Frame", nullptr, &m_7Cycles)) {
+            EventManager::Dispatcher().enqueue(Events::SetCycles(7));
             EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
-          if (ImGui::MenuItem("load and store operations leave i unchanged", nullptr, &m_LoadStoreQuirk)) {
-            EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::LoadStore, m_LoadStoreQuirk});
+          if (ImGui::MenuItem("15 Cycles/Frame", nullptr, &m_15Cycles)) {
+            EventManager::Dispatcher().enqueue(Events::SetCycles(15));
             EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
-          if (ImGui::MenuItem("4 high bits of target address determines the offset register of jump0 instead of v0.",
-                              nullptr, &m_JumpQuirk)) {
-            EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Jump, m_JumpQuirk});
+          if (ImGui::MenuItem("20 Cycles/Frame", nullptr, &m_20Cycles)) {
+            EventManager::Dispatcher().enqueue(Events::SetCycles(20));
             EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
-          if (ImGui::MenuItem("clear vF after vx |= vy, vx &= vy, and vx ^= vy",
-                              nullptr, &m_LogicQuirk)) {
-            EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Logic, m_LogicQuirk});
+          if (ImGui::MenuItem("30 Cycles/Frame", nullptr, &m_30Cycles)) {
+            EventManager::Dispatcher().enqueue(Events::SetCycles(30));
             EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
-          if (ImGui::MenuItem("clip sprites at screen edges instead of wrapping",
-                              nullptr, &m_ClipQuirk)) {
-            EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Clip, m_ClipQuirk});
+          if (ImGui::MenuItem("100 Cycles/Frame", nullptr, &m_100Cycles)) {
+            EventManager::Dispatcher().enqueue(Events::SetCycles(100));
             EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
-          if (ImGui::MenuItem("render sprites only in vblank",
-                              nullptr, &m_VBlankQuirk)) {
-            EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::VBlank, m_VBlankQuirk});
+          if (ImGui::MenuItem("200 Cycles/Frame", nullptr, &m_200Cycles)) {
+            EventManager::Dispatcher().enqueue(Events::SetCycles(200));
             EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
-          if (ImGui::MenuItem("render height 0 sprites as 8x16 sprites in lores mode",
-                              nullptr, &m_LoresQuirk)) {
-            EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::LoresSprites, m_LoresQuirk});
+          if (ImGui::MenuItem("500 Cycles/Frame", nullptr, &m_500Cycles)) {
+            EventManager::Dispatcher().enqueue(Events::SetCycles(500));
             EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
-          if (ImGui::MenuItem("set carry if I overflows, clear otherwise",
-                              nullptr, &m_IRegCarryQuirk)) {
-            EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::IRegCarry, m_IRegCarryQuirk});
+          if (ImGui::MenuItem("1000 Cycles/Frame", nullptr, &m_1000Cycles)) {
+            EventManager::Dispatcher().enqueue(Events::SetCycles(1000));
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
+          }
+
+          ImGui::Separator();
+
+          if (ImGui::MenuItem("Warp Factor 10k", nullptr, &m_10000Cycles)) {
+            EventManager::Dispatcher().enqueue(Events::SetCycles(10000));
             EventManager::Dispatcher().enqueue(Events::SavePrefs());
           }
 
           ImGui::EndMenu();
         }
-        ImGui::EndMenu();
-      }
 
-      auto drawPalette = [](const std::vector<Color> &pal) {
-        float sz = ImGui::GetTextLineHeight();
-        ImVec2 p = ImGui::GetCursorScreenPos();
+        if (ImGui::BeginMenu("Compatibility")) {
+          if (ImGui::MenuItem("VIP", nullptr, &m_VIPMode)) {
+            EventManager::Dispatcher().enqueue<Events::VIPCompat>({});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
+          }
+          if (ImGui::MenuItem("SCHIP", nullptr, &m_SCHIPMode)) {
+            EventManager::Dispatcher().enqueue<Events::SCHIPCompat>({});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
+          }
+          if (ImGui::MenuItem("XO-Chip", nullptr, &m_XOMode)) {
+            EventManager::Dispatcher().enqueue<Events::XOCompat>({});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
+          }
+          ImGui::Separator();
 
-        for (auto i = 1; i <= 4; i++) {
-          ImGui::GetWindowDrawList()->AddRectFilled(p,
-                                                    ImVec2(p.x + sz, p.y + sz),
-                                                    IM_COL32(
-                                                        pal[i - 1].r,
-                                                        pal[i - 1].g,
-                                                        pal[i - 1].b,
-                                                        pal[i - 1].a
-                                                    ));
+          if (ImGui::BeginMenu("Quirks")) {
+            if (ImGui::MenuItem("<<= and >>= modify vx in place and ignore vy", nullptr, &m_ShiftQuirk)) {
+              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Shift, m_ShiftQuirk});
+              EventManager::Dispatcher().enqueue(Events::SavePrefs());
+            }
 
-          p.x += sz + 4.0f;
+            if (ImGui::MenuItem("load and store operations leave i unchanged", nullptr, &m_LoadStoreQuirk)) {
+              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::LoadStore, m_LoadStoreQuirk});
+              EventManager::Dispatcher().enqueue(Events::SavePrefs());
+            }
+
+            if (ImGui::MenuItem("4 high bits of target address determines the offset register of jump0 instead of v0.",
+                                nullptr, &m_JumpQuirk)) {
+              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Jump, m_JumpQuirk});
+              EventManager::Dispatcher().enqueue(Events::SavePrefs());
+            }
+
+            if (ImGui::MenuItem("clear vF after vx |= vy, vx &= vy, and vx ^= vy",
+                                nullptr, &m_LogicQuirk)) {
+              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Logic, m_LogicQuirk});
+              EventManager::Dispatcher().enqueue(Events::SavePrefs());
+            }
+
+            if (ImGui::MenuItem("clip sprites at screen edges instead of wrapping",
+                                nullptr, &m_ClipQuirk)) {
+              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Clip, m_ClipQuirk});
+              EventManager::Dispatcher().enqueue(Events::SavePrefs());
+            }
+
+            if (ImGui::MenuItem("render sprites only in vblank",
+                                nullptr, &m_VBlankQuirk)) {
+              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::VBlank, m_VBlankQuirk});
+              EventManager::Dispatcher().enqueue(Events::SavePrefs());
+            }
+
+            if (ImGui::MenuItem("render height 0 sprites as 8x16 sprites in lores mode",
+                                nullptr, &m_LoresQuirk)) {
+              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::LoresSprites, m_LoresQuirk});
+              EventManager::Dispatcher().enqueue(Events::SavePrefs());
+            }
+
+            if (ImGui::MenuItem("set carry if I overflows, clear otherwise",
+                                nullptr, &m_IRegCarryQuirk)) {
+              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::IRegCarry, m_IRegCarryQuirk});
+              EventManager::Dispatcher().enqueue(Events::SavePrefs());
+            }
+
+            ImGui::EndMenu();
+          }
+          ImGui::EndMenu();
         }
-        ImGui::Dummy(ImVec2(sz * 5, sz));
-        ImGui::SameLine();
-      };
 
-      auto &currentPallete = bus.m_Display.Palette();
+        auto drawPalette = [](const std::vector<Color> &pal) {
+          float sz = ImGui::GetTextLineHeight();
+          ImVec2 p = ImGui::GetCursorScreenPos();
 
-      if (ImGui::BeginMenu("Colors")) {
+          for (auto i = 1; i <= 4; i++) {
+            ImGui::GetWindowDrawList()->AddRectFilled(p,
+                                                      ImVec2(p.x + sz, p.y + sz),
+                                                      IM_COL32(
+                                                          pal[i - 1].r,
+                                                          pal[i - 1].g,
+                                                          pal[i - 1].b,
+                                                          pal[i - 1].a
+                                                      ));
 
-        drawPalette(m_GreyPalette);
-        if (ImGui::MenuItem("Grayscale", nullptr, &m_PalGrey)) {
-          m_PalOcto = false;
-          m_PalNeat = false;
-          m_PalKesh = false;
-          EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_GreyPalette});
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
+            p.x += sz + 4.0f;
+          }
+          ImGui::Dummy(ImVec2(sz * 5, sz));
+          ImGui::SameLine();
+        };
 
-        drawPalette(m_NeatPalette);
-        if (ImGui::MenuItem("Neatboy", nullptr, &m_PalNeat)) {
-          m_PalOcto = false;
-          m_PalGrey = false;
-          m_PalKesh = false;
-          EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_NeatPalette});
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
+        auto &currentPallete = bus.m_Display.Palette();
 
-        drawPalette(m_OctoPalette);
-        if (ImGui::MenuItem("Octo", nullptr, &m_PalOcto)) {
-          m_PalGrey = false;
-          m_PalNeat = false;
-          m_PalKesh = false;
-          EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_OctoPalette});
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
+        if (ImGui::BeginMenu("Colors")) {
 
-        drawPalette(m_KeshaPalette);
-        if (ImGui::MenuItem("Kesha", nullptr, &m_PalKesh)) {
-          m_PalOcto = false;
-          m_PalNeat = false;
-          m_PalGrey = false;
-          EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_KeshaPalette});
-          EventManager::Dispatcher().enqueue(Events::SavePrefs());
-        }
+          drawPalette(m_GreyPalette);
+          if (ImGui::MenuItem("Grayscale", nullptr, &m_PalGrey)) {
+            m_PalOcto = false;
+            m_PalNeat = false;
+            m_PalKesh = false;
+            EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_GreyPalette});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
+          }
 
-        ImGui::Separator();
+          drawPalette(m_NeatPalette);
+          if (ImGui::MenuItem("Neatboy", nullptr, &m_PalNeat)) {
+            m_PalOcto = false;
+            m_PalGrey = false;
+            m_PalKesh = false;
+            EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_NeatPalette});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
+          }
 
-        drawPalette(currentPallete);
-        if (ImGui::MenuItem("Set Colors...")) {
-          m_ShowColorEditor = true;
-          m_PalGrey = false;
-          m_PalOcto = false;
-          m_PalNeat = false;
-          m_PalKesh = false;
+          drawPalette(m_OctoPalette);
+          if (ImGui::MenuItem("Octo", nullptr, &m_PalOcto)) {
+            m_PalGrey = false;
+            m_PalNeat = false;
+            m_PalKesh = false;
+            EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_OctoPalette});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
+          }
+
+          drawPalette(m_KeshaPalette);
+          if (ImGui::MenuItem("Kesha", nullptr, &m_PalKesh)) {
+            m_PalOcto = false;
+            m_PalNeat = false;
+            m_PalGrey = false;
+            EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_KeshaPalette});
+            EventManager::Dispatcher().enqueue(Events::SavePrefs());
+          }
+
+          ImGui::Separator();
+
+          drawPalette(currentPallete);
+          if (ImGui::MenuItem("Set Colors...")) {
+            m_ShowColorEditor = true;
+            m_PalGrey = false;
+            m_PalOcto = false;
+            m_PalNeat = false;
+            m_PalKesh = false;
+          }
+
+          ImGui::EndMenu();
         }
 
         ImGui::EndMenu();

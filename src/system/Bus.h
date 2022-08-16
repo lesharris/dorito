@@ -11,7 +11,7 @@
 #include "cpu/Memory.h"
 #include "display/Display.h"
 
-#include "common/GamePrefs.h"
+#include "common/Preferences.h"
 
 namespace dorito {
 
@@ -142,6 +142,10 @@ namespace dorito {
 
     void LoadGamePrefs();
 
+    void SavePrefs();
+
+    void LoadPrefs();
+
   private:
     void HandleLoadRom(const Events::LoadROM &event);
 
@@ -171,6 +175,8 @@ namespace dorito {
 
     void HandleSavePrefs(const Events::SavePrefs &event);
 
+    void HandleSetMute(const Events::SetMute &event);
+
   private:
     friend class UI;
 
@@ -182,11 +188,14 @@ namespace dorito {
     uint16_t m_CyclesPerFrame = 100;
     bool m_Running = false;
     bool m_UseBeepBuffer = true;
+    bool m_Muted = false;
 
     CompatProfile m_CompatProfile = CompatProfile::XOChip;
 
     std::string m_RomPath;
     GamePrefs m_GamePrefs;
+
+    DoritoPrefs m_Prefs;
 
     AudioStream m_Sound;
   };

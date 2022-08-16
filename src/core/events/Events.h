@@ -199,4 +199,10 @@ namespace dorito::Events {
   struct SavePrefs : public Event {
     SavePrefs() : Event() {}
   };
+
+  struct SetMute : public Event {
+    SetMute(bool isSet) : Event(), isSet(isSet) {}
+
+    bool isSet;
+  };
 }

@@ -18,6 +18,14 @@ namespace dorito {
 
   void from_json(const json &j, GamePrefs &gp);
 
+  struct DoritoPrefs {
+    bool isMuted;
+  };
+
+  void to_json(json &j, const DoritoPrefs &dp);
+
+  void from_json(const json &j, DoritoPrefs &dp);
+
 }
 
 void to_json(json &j, const Color &c);

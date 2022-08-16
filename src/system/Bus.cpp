@@ -73,10 +73,17 @@ namespace dorito {
         &Bus::HandleSavePrefs
     >(this);
 
+    EventManager::Get().Attach<
+        Events::SetMute,
+        &Bus::HandleSetMute
+    >(this);
+
     m_Sound = LoadAudioStream(44100, 32, 1);
     SetAudioStreamCallback(m_Sound, &Bus::AudioCallback);
     AttachAudioStreamProcessor(m_Sound, &Bus::LowpassFilterCallback);
     SetAudioStreamVolume(m_Sound, 1.0f);
+
+    LoadPrefs();
   }
 
   Bus::~Bus() {
@@ -115,7 +122,7 @@ namespace dorito {
       }
 
       if (m_Cpu.regs.st > 0) {
-        if (!IsAudioStreamPlaying(m_Sound)) {
+        if (!IsAudioStreamPlaying(m_Sound) && !m_Muted) {
           PlayAudioStream(m_Sound);
         }
       }
@@ -590,6 +597,38 @@ namespace dorito {
     if (!SaveFileText(prefsPath.c_str(), (char *) to_string(prefs).c_str())) {
       spdlog::get("console")->warn("Could not save game preferences at {}", prefsPath);
     }
+  }
+
+  void Bus::SavePrefs() {
+    m_Prefs.isMuted = m_Muted;
+
+    json prefs = m_Prefs;
+
+    if (!SaveFileText("dorito.prefs", (char *) to_string(prefs).c_str())) {
+      spdlog::get("console")->warn("Could not save preferences!");
+    }
+  }
+
+  void Bus::LoadPrefs() {
+    auto prefs = LoadFileText("dorito.prefs");
+
+    if (prefs) {
+      m_Prefs = nlohmann::json::parse(prefs);
+
+      m_Muted = m_Prefs.isMuted;
+
+      UnloadFileText(prefs);
+    }
+  }
+
+  void Bus::HandleSetMute(const Events::SetMute &event) {
+    m_Muted = event.isSet;
+
+    if (m_Muted && IsAudioStreamPlaying(m_Sound)) {
+      StopAudioStream(m_Sound);
+    }
+
+    SavePrefs();
   }
 
 } // dorito

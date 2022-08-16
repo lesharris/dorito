@@ -58,6 +58,8 @@ namespace dorito {
     void HandleKeyPress(Events::KeyPressed &event);
 
   private:
+    bool m_DoritoMuted = false;
+    
     bool m_ShowDemo = false;
     bool m_ShowEmu = true;
     bool m_ShowMemory = true;
