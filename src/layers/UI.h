@@ -1,7 +1,6 @@
 #pragma once
 
 #include <raylib.h>
-#include <zep.h>
 #include <vector>
 
 #include "common/common.h"
@@ -16,6 +15,8 @@
 #include "external/imgui/backends/imgui_impl_opengl3.h"
 #include "external/imgui/backends/imgui_impl_glfw.h"
 #include "external/imgui_extra/imgui_memory_editor.h"
+
+#include "external/zep/ZepEditor.h"
 
 namespace dorito {
 
@@ -46,7 +47,7 @@ namespace dorito {
 
     void ColorEditor();
 
-    void CodeEditor();
+    void Code();
 
   private:
     ImVec2 GetLargestSizeForViewport();
@@ -130,8 +131,7 @@ namespace dorito {
 
     uint16_t m_PrevPC = 0;
 
-    Scope<Zep::ZepEditor_ImGui> m_Editor;
-    Zep::ZepBuffer *m_CodeBuffer;
+    CodeEditor m_Editor{"Code"};
   };
 
 } // dorito

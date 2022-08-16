@@ -98,7 +98,11 @@ add_executable(${PROJECT_NAME}
     src/system/Bus.cpp
     src/system/Bus.h
     src/display/Display.cpp
-    src/display/Display.h)
+    src/display/Display.h
+    src/external/zep/ZepEditor.cpp
+    src/external/zep/ZepEditor.h
+    src/external/zep/mode_repl.cpp
+    src/external/zep/mode_repl.h)
 
 # Compile Options
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)

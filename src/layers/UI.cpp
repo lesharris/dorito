@@ -30,9 +30,6 @@ namespace dorito {
     ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    m_Editor = CreateScope<Zep::ZepEditor_ImGui>("", Zep::NVec2{2.0f, 2.0f});
-    m_CodeBuffer = m_Editor->InitWithText("Code", "");
-
     EventManager::Get().Attach<
         Events::KeyPressed,
         &::dorito::UI::HandleKeyPress
@@ -396,7 +393,7 @@ namespace dorito {
       }
 
       if (m_ShowCodeEditor) {
-        CodeEditor();
+        Code();
       }
 
       Viewport();
@@ -924,28 +921,11 @@ namespace dorito {
     }
   }
 
-  void UI::CodeEditor() {
+  void UI::Code() {
     if (!ImGui::Begin("Code", &m_ShowCodeEditor)) {
       ImGui::End();
     } else {
-      m_Editor->SetGlobalMode("Standard");
-
-      if (ImGui::IsWindowFocused()) {
-        ImGuiIO &io = ImGui::GetIO();
-        io.WantCaptureKeyboard = true;
-        io.WantTextInput = true;
-        m_Editor->HandleInput();
-      } else {
-        m_Editor->ResetCursorTimer();
-      }
-
-      m_Editor->UpdateWindowState();
-
-      m_Editor->SetDisplayRegion(Zep::toNVec2f(ImGui::GetCursorScreenPos()),
-                                 Zep::toNVec2f(ImGui::GetContentRegionAvail()) +
-                                 Zep::toNVec2f(ImGui::GetCursorScreenPos()));
-      m_Editor->Display();
-
+      m_Editor.draw();
       ImGui::End();
     }
   }
