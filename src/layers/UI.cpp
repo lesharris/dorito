@@ -8,7 +8,6 @@
 
 namespace dorito {
   void UI::OnAttach() {
-// Hack to use opengl3 backend for imgui
     ImGui::CreateContext(nullptr);
 
     ImGuiIO &io = ImGui::GetIO();
@@ -67,340 +66,34 @@ namespace dorito {
   void UI::Render() {
     auto &bus = Bus::Get();
     auto &io = ImGui::GetIO();
-    static bool opt_fullscreen = true;
-    static bool opt_padding = false;
-    static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
     const ImGuiViewport *viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->WorkPos);
+    ImGui::SetNextWindowSize(viewport->WorkSize);
+    ImGui::SetNextWindowViewport(viewport->ID);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
-    if (opt_fullscreen) {
-      ImGui::SetNextWindowPos(viewport->WorkPos);
-      ImGui::SetNextWindowSize(viewport->WorkSize);
-      ImGui::SetNextWindowViewport(viewport->ID);
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-      window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
-                      ImGuiWindowFlags_NoMove;
-      window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-    } else {
-      dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
-    }
+    ImGui::Begin("Dockspace", nullptr,
+                 ImGuiWindowFlags_MenuBar |
+                 ImGuiWindowFlags_NoDocking |
+                 ImGuiWindowFlags_NoTitleBar |
+                 ImGuiWindowFlags_NoCollapse |
+                 ImGuiWindowFlags_NoResize |
+                 ImGuiWindowFlags_NoMove |
+                 ImGuiWindowFlags_NoBringToFrontOnFocus |
+                 ImGuiWindowFlags_NoNavFocus);
 
-    if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-      window_flags |= ImGuiWindowFlags_NoBackground;
-
-    if (!opt_padding)
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-
-    ImGui::Begin("Dockspace", nullptr, window_flags);
-
-    if (!opt_padding)
-      ImGui::PopStyleVar();
-
-    if (opt_fullscreen)
-      ImGui::PopStyleVar(2);
+    ImGui::PopStyleVar(3);
 
     if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
       ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-      ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+      ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
     }
 
-    auto cycles = bus.CyclesPerFrame();
-
-    m_7Cycles = cycles == 7;
-    m_15Cycles = cycles == 15;
-    m_20Cycles = cycles == 20;
-    m_30Cycles = cycles == 30;
-    m_100Cycles = cycles == 100;
-    m_200Cycles = cycles == 200;
-    m_500Cycles = cycles == 500;
-    m_1000Cycles = cycles == 1000;
-    m_10000Cycles = cycles == 10000;
-
-    auto quirks = bus.Quirks();
-
-    m_ShiftQuirk = quirks[static_cast<uint8_t>(Chip8::Quirk::Shift)];
-    m_LoadStoreQuirk = quirks[static_cast<uint8_t>(Chip8::Quirk::LoadStore)];
-    m_JumpQuirk = quirks[static_cast<uint8_t>(Chip8::Quirk::Jump)];
-    m_LogicQuirk = quirks[static_cast<uint8_t>(Chip8::Quirk::Logic)];
-    m_ClipQuirk = quirks[static_cast<uint8_t>(Chip8::Quirk::Clip)];
-    m_VBlankQuirk = quirks[static_cast<uint8_t>(Chip8::Quirk::VBlank)];
-    m_IRegCarryQuirk = quirks[static_cast<uint8_t>(Chip8::Quirk::IRegCarry)];
-
-    auto profile = bus.GetCompatProfile();
-
-    m_VIPMode = profile == Bus::CompatProfile::VIP;
-    m_SCHIPMode = profile == Bus::CompatProfile::SCHIP;
-    m_XOMode = profile == Bus::CompatProfile::XOChip;
-
-    if (ImGui::BeginMenuBar()) {
-      if (ImGui::BeginMenu("File")) {
-        if (ImGui::MenuItem("Open ROM...", nullptr)) {
-          nfdchar_t *outPath = nullptr;
-
-          EventManager::Dispatcher().trigger<Events::Reset>({});
-
-          nfdresult_t result = NFD_OpenDialog("ch8,c8", nullptr, &outPath);
-
-          switch (result) {
-            case NFD_OKAY: {
-              std::string path{outPath};
-              m_PrevPC = 0;
-              EventManager::Dispatcher().trigger(Events::LoadROM{path});
-              delete outPath;
-            }
-              break;
-            case NFD_CANCEL:
-              break;
-            case NFD_ERROR:
-              spdlog::get("console")->error("{}", NFD_GetError());
-              break;
-          }
-        }
-
-        ImGui::Separator();
-
-        if (ImGui::MenuItem("Unload ROM")) {
-          m_PrevPC = 0;
-          EventManager::Dispatcher().trigger(Events::UnloadROM{});
-        }
-
-        if (ImGui::MenuItem("Reset")) {
-          m_PrevPC = 0;
-          EventManager::Dispatcher().trigger(Events::Reset{});
-        }
-
-        ImGui::Separator();
-        if (ImGui::MenuItem("Quit", nullptr)) {
-          EventManager::Dispatcher().trigger<Events::WantQuit>();
-        }
-
-        ImGui::EndMenu();
-      }
-
-      m_DoritoMuted = bus.m_Muted;
-
-      if (ImGui::BeginMenu("Edit")) {
-        if (ImGui::MenuItem("Mute Dorito", nullptr, &m_DoritoMuted)) {
-          EventManager::Dispatcher().enqueue(Events::SetMute(m_DoritoMuted));
-        }
-
-        ImGui::Separator();
-        if (ImGui::BeginMenu("Speed")) {
-          if (ImGui::MenuItem("7 Cycles/Frame", nullptr, &m_7Cycles)) {
-            EventManager::Dispatcher().enqueue(Events::SetCycles(7));
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          if (ImGui::MenuItem("15 Cycles/Frame", nullptr, &m_15Cycles)) {
-            EventManager::Dispatcher().enqueue(Events::SetCycles(15));
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          if (ImGui::MenuItem("20 Cycles/Frame", nullptr, &m_20Cycles)) {
-            EventManager::Dispatcher().enqueue(Events::SetCycles(20));
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          if (ImGui::MenuItem("30 Cycles/Frame", nullptr, &m_30Cycles)) {
-            EventManager::Dispatcher().enqueue(Events::SetCycles(30));
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          if (ImGui::MenuItem("100 Cycles/Frame", nullptr, &m_100Cycles)) {
-            EventManager::Dispatcher().enqueue(Events::SetCycles(100));
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          if (ImGui::MenuItem("200 Cycles/Frame", nullptr, &m_200Cycles)) {
-            EventManager::Dispatcher().enqueue(Events::SetCycles(200));
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          if (ImGui::MenuItem("500 Cycles/Frame", nullptr, &m_500Cycles)) {
-            EventManager::Dispatcher().enqueue(Events::SetCycles(500));
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          if (ImGui::MenuItem("1000 Cycles/Frame", nullptr, &m_1000Cycles)) {
-            EventManager::Dispatcher().enqueue(Events::SetCycles(1000));
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          ImGui::Separator();
-
-          if (ImGui::MenuItem("Warp Factor 10k", nullptr, &m_10000Cycles)) {
-            EventManager::Dispatcher().enqueue(Events::SetCycles(10000));
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          ImGui::EndMenu();
-        }
-
-        if (ImGui::BeginMenu("Compatibility")) {
-          if (ImGui::MenuItem("VIP", nullptr, &m_VIPMode)) {
-            EventManager::Dispatcher().enqueue<Events::VIPCompat>({});
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-          if (ImGui::MenuItem("SCHIP", nullptr, &m_SCHIPMode)) {
-            EventManager::Dispatcher().enqueue<Events::SCHIPCompat>({});
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-          if (ImGui::MenuItem("XO-Chip", nullptr, &m_XOMode)) {
-            EventManager::Dispatcher().enqueue<Events::XOCompat>({});
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-          ImGui::Separator();
-
-          if (ImGui::BeginMenu("Quirks")) {
-            if (ImGui::MenuItem("<<= and >>= modify vx in place and ignore vy", nullptr, &m_ShiftQuirk)) {
-              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Shift, m_ShiftQuirk});
-              EventManager::Dispatcher().enqueue(Events::SavePrefs());
-            }
-
-            if (ImGui::MenuItem("load and store operations leave i unchanged", nullptr, &m_LoadStoreQuirk)) {
-              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::LoadStore, m_LoadStoreQuirk});
-              EventManager::Dispatcher().enqueue(Events::SavePrefs());
-            }
-
-            if (ImGui::MenuItem("4 high bits of target address determines the offset register of jump0 instead of v0.",
-                                nullptr, &m_JumpQuirk)) {
-              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Jump, m_JumpQuirk});
-              EventManager::Dispatcher().enqueue(Events::SavePrefs());
-            }
-
-            if (ImGui::MenuItem("clear vF after vx |= vy, vx &= vy, and vx ^= vy",
-                                nullptr, &m_LogicQuirk)) {
-              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Logic, m_LogicQuirk});
-              EventManager::Dispatcher().enqueue(Events::SavePrefs());
-            }
-
-            if (ImGui::MenuItem("clip sprites at screen edges instead of wrapping",
-                                nullptr, &m_ClipQuirk)) {
-              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::Clip, m_ClipQuirk});
-              EventManager::Dispatcher().enqueue(Events::SavePrefs());
-            }
-
-            if (ImGui::MenuItem("render sprites only in vblank",
-                                nullptr, &m_VBlankQuirk)) {
-              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::VBlank, m_VBlankQuirk});
-              EventManager::Dispatcher().enqueue(Events::SavePrefs());
-            }
-
-            if (ImGui::MenuItem("render height 0 sprites as 8x16 sprites in lores mode",
-                                nullptr, &m_LoresQuirk)) {
-              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::LoresSprites, m_LoresQuirk});
-              EventManager::Dispatcher().enqueue(Events::SavePrefs());
-            }
-
-            if (ImGui::MenuItem("set carry if I overflows, clear otherwise",
-                                nullptr, &m_IRegCarryQuirk)) {
-              EventManager::Dispatcher().enqueue<Events::SetQuirk>({Chip8::Quirk::IRegCarry, m_IRegCarryQuirk});
-              EventManager::Dispatcher().enqueue(Events::SavePrefs());
-            }
-
-            ImGui::EndMenu();
-          }
-          ImGui::EndMenu();
-        }
-
-        auto drawPalette = [](const std::vector<Color> &pal) {
-          float sz = ImGui::GetTextLineHeight();
-          ImVec2 p = ImGui::GetCursorScreenPos();
-
-          for (auto i = 1; i <= 4; i++) {
-            ImGui::GetWindowDrawList()->AddRectFilled(p,
-                                                      ImVec2(p.x + sz, p.y + sz),
-                                                      IM_COL32(
-                                                          pal[i - 1].r,
-                                                          pal[i - 1].g,
-                                                          pal[i - 1].b,
-                                                          pal[i - 1].a
-                                                      ));
-
-            p.x += sz + 4.0f;
-          }
-          ImGui::Dummy(ImVec2(sz * 5, sz));
-          ImGui::SameLine();
-        };
-
-        auto &currentPallete = bus.m_Display.Palette();
-
-        if (ImGui::BeginMenu("Colors")) {
-
-          drawPalette(m_GreyPalette);
-          if (ImGui::MenuItem("Grayscale", nullptr, &m_PalGrey)) {
-            m_PalOcto = false;
-            m_PalNeat = false;
-            m_PalKesh = false;
-            EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_GreyPalette});
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          drawPalette(m_NeatPalette);
-          if (ImGui::MenuItem("Neatboy", nullptr, &m_PalNeat)) {
-            m_PalOcto = false;
-            m_PalGrey = false;
-            m_PalKesh = false;
-            EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_NeatPalette});
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          drawPalette(m_OctoPalette);
-          if (ImGui::MenuItem("Octo", nullptr, &m_PalOcto)) {
-            m_PalGrey = false;
-            m_PalNeat = false;
-            m_PalKesh = false;
-            EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_OctoPalette});
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          drawPalette(m_KeshaPalette);
-          if (ImGui::MenuItem("Kesha", nullptr, &m_PalKesh)) {
-            m_PalOcto = false;
-            m_PalNeat = false;
-            m_PalGrey = false;
-            EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{m_KeshaPalette});
-            EventManager::Dispatcher().enqueue(Events::SavePrefs());
-          }
-
-          ImGui::Separator();
-
-          drawPalette(currentPallete);
-          if (ImGui::MenuItem("Set Colors...")) {
-            m_ShowColorEditor = true;
-            m_PalGrey = false;
-            m_PalOcto = false;
-            m_PalNeat = false;
-            m_PalKesh = false;
-          }
-
-          ImGui::EndMenu();
-        }
-
-        ImGui::EndMenu();
-      }
-
-      if (ImGui::BeginMenu("Development")) {
-        ImGui::MenuItem("Code Editor", nullptr, &m_ShowCodeEditor);
-        ImGui::EndMenu();
-      }
-
-      if (ImGui::BeginMenu("Tools")) {
-        if (ImGui::BeginMenu("CPU")) {
-          ImGui::MenuItem("Registers", nullptr, &m_ShowRegisters);
-          ImGui::MenuItem("Disassembly", nullptr, &m_ShowDisassembly);
-          ImGui::EndMenu();
-        }
-        ImGui::MenuItem("Memory Viewer", nullptr, &m_ShowMemory);
-        ImGui::MenuItem("Audio Viewer", nullptr, &m_ShowAudio);
-        ImGui::Separator();
-        ImGui::MenuItem("ImGui Demo", nullptr, &m_ShowDemo);
-        ImGui::EndMenu();
-      }
-      ImGui::EndMenuBar();
-    }
+    UpdateMenuStatus();
+    DrawMenubar();
 
     // Display Windows
     {
@@ -410,9 +103,9 @@ namespace dorito {
       }
 
       if (m_ShowMemory) {
-        static MemoryEditor romViewer;
+        static MemoryEditor memoryViewer;
 
-        romViewer.DrawWindow("Memory", &bus.m_Ram.m_Ram[0], 1024 * 64);
+        memoryViewer.DrawWindow("Memory", &bus.m_Ram.m_Ram[0], 1024 * 64);
       }
 
       if (m_ShowRegisters) {
@@ -484,14 +177,95 @@ namespace dorito {
     return {viewportX + ImGui::GetCursorPosX(), viewportY + ImGui::GetCursorPosY()};
   }
 
+  ImVec2 operator+(const ImVec2 &lhs, const ImVec2 &rhs) {
+    return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
+  }
+
+  ImVec2 UI::ImRotate(const ImVec2 &v, float cos_a, float sin_a) {
+    return ImVec2(v.x * cos_a - v.y * sin_a, v.x * sin_a + v.y * cos_a);
+  }
+
+  void UI::ImageRotated(ImTextureID tex_id, ImVec2 center, ImVec2 size, float angle) {
+    ImDrawList *draw_list = ImGui::GetWindowDrawList();
+
+    float cos_a = cosf(angle);
+    float sin_a = sinf(angle);
+    ImVec2 pos[4] =
+        {
+            center + ImRotate(ImVec2(-size.x * 0.5f, -size.y * 0.5f), cos_a, sin_a),
+            center + ImRotate(ImVec2(+size.x * 0.5f, -size.y * 0.5f), cos_a, sin_a),
+            center + ImRotate(ImVec2(+size.x * 0.5f, +size.y * 0.5f), cos_a, sin_a),
+            center + ImRotate(ImVec2(-size.x * 0.5f, +size.y * 0.5f), cos_a, sin_a)
+        };
+    ImVec2 uvs[4] =
+        {
+            ImVec2(0.0f, 1.0f),
+            ImVec2(1.0f, 1.0f),
+            ImVec2(1.0f, 0.0f),
+            ImVec2(0.0f, 0.0f)
+        };
+
+    draw_list->AddImageQuad(tex_id, pos[0], pos[1], pos[2], pos[3], uvs[0], uvs[1], uvs[2], uvs[3], IM_COL32_WHITE);
+  }
+
+  void UI::EnablePalette(uint8_t pal) {
+    memset(m_PaletteState, 0, 9);
+    m_PaletteState[pal] = true;
+  }
+
+  void UI::SetQuirkEntry(uint8_t quirkIndex, bool isSet) {
+    auto quirk = static_cast<Chip8::Quirk>(quirkIndex);
+    auto it = std::find_if(
+        m_QuirkEntries.begin(),
+        m_QuirkEntries.end(),
+        [quirk](const QuirkEntry &entry) {
+          return quirk == entry.quirk;
+        });
+
+    if (it != std::end(m_QuirkEntries)) {
+      it->set = isSet;
+    }
+  }
+
+  void UI::UpdateMenuStatus() {
+    auto &bus = Bus::Get();
+
+    auto cycles = bus.CyclesPerFrame();
+
+    uint8_t index = 0;
+    for (const auto &val: m_CycleSet) {
+      if (m_CycleEntries[index].cycles == 0) {
+        index++;
+      }
+
+      m_CycleEntries[index++].set = (cycles == val);
+    }
+
+    auto quirks = bus.Quirks();
+
+    for (const auto &entry: m_QuirkEntries) {
+      uint8_t quirkIndex = static_cast<uint8_t>(entry.quirk);
+      SetQuirkEntry(quirkIndex, quirks[quirkIndex]);
+    }
+
+    auto profile = bus.GetCompatProfile();
+
+    m_ProfileEntries[0].set = profile == Bus::CompatProfile::VIP;
+    m_ProfileEntries[1].set = profile == Bus::CompatProfile::SCHIP;
+    m_ProfileEntries[2].set = profile == Bus::CompatProfile::XOChip;
+
+    m_DoritoMuted = bus.m_Muted;
+  }
+
   /*
    * Windows
    */
 
-
   void UI::Viewport() {
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_FirstUseEver);
+
+    static float angle = 0.0f;
 
     // Render our Emu Viewport
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -541,6 +315,23 @@ namespace dorito {
         EventManager::Dispatcher().trigger<Events::ViewportResized>({size.x, size.y});
       } else {
         auto &texture = Dorito::Get().GetRenderTexture();
+
+        /*auto &io = ImGui::GetIO();
+
+         angle += io.DeltaTime * 1.0f;
+
+         float ninety = 1.5708;
+         float one80 = 3.14159;
+         float two70 = 4.71239;
+
+         ImageRotated(reinterpret_cast<ImTextureID>((uint64_t) texture.texture.id),
+                      {
+                          emuWindowPos.x,
+                          (emuWindowPos.y / 2.0f) + (emuWindowSize.y) - ImGui::GetCursorPosY()
+                      },
+                      emuWindowSize, 0);*/
+
+
         ImGui::Image(reinterpret_cast<ImTextureID>((uint64_t) texture.texture.id),
                      emuWindowSize,
                      {0, 1}, {1, 0});
@@ -973,5 +764,182 @@ namespace dorito {
     }
   }
 
+  /*
+   * UI Elements
+   */
+  void UI::DrawMenubar() {
+    auto &bus = Bus::Get();
+
+    if (ImGui::BeginMenuBar()) {
+      if (ImGui::BeginMenu("File")) {
+        if (ImGui::MenuItem("Open ROM...", nullptr)) {
+          nfdchar_t *outPath = nullptr;
+
+          EventManager::Dispatcher().trigger<Events::Reset>({});
+
+          nfdresult_t result = NFD_OpenDialog("ch8,c8", nullptr, &outPath);
+
+          switch (result) {
+            case NFD_OKAY: {
+              std::string path{outPath};
+              m_PrevPC = 0;
+              EventManager::Dispatcher().trigger(Events::LoadROM{path});
+              delete outPath;
+            }
+              break;
+            case NFD_CANCEL:
+              break;
+            case NFD_ERROR:
+              spdlog::get("console")->error("{}", NFD_GetError());
+              break;
+          }
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::MenuItem("Unload ROM")) {
+          m_PrevPC = 0;
+          EventManager::Dispatcher().trigger(Events::UnloadROM{});
+        }
+
+        if (ImGui::MenuItem("Reset")) {
+          m_PrevPC = 0;
+          EventManager::Dispatcher().trigger(Events::Reset{});
+        }
+
+        ImGui::Separator();
+        if (ImGui::MenuItem("Quit", nullptr)) {
+          EventManager::Dispatcher().trigger<Events::WantQuit>();
+        }
+
+        ImGui::EndMenu();
+      }
+
+      if (ImGui::BeginMenu("Edit")) {
+        if (ImGui::MenuItem("Mute Dorito", nullptr, &m_DoritoMuted)) {
+          EventManager::Dispatcher().enqueue(Events::SetMute(m_DoritoMuted));
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::BeginMenu("Speed")) {
+          for (auto &entry: m_CycleEntries) {
+            if (entry.cycles == 0) {
+              ImGui::Separator();
+              continue;
+            }
+
+            if (ImGui::MenuItem(entry.label.c_str(), nullptr, &(entry.set))) {
+              EventManager::Dispatcher().enqueue(Events::SetCycles(entry.cycles));
+              EventManager::Dispatcher().enqueue(Events::SavePrefs());
+            }
+          }
+          ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Compatibility")) {
+          for (auto &entry: m_ProfileEntries) {
+            if (ImGui::MenuItem(entry.label.c_str(), nullptr, &(entry.set))) {
+
+              switch (entry.profile) {
+                case Bus::CompatProfile::VIP:
+                  EventManager::Dispatcher().enqueue<Events::VIPCompat>({});
+                  break;
+                case Bus::CompatProfile::SCHIP:
+                  EventManager::Dispatcher().enqueue<Events::SCHIPCompat>({});
+                  break;
+                case Bus::CompatProfile::XOChip:
+                  EventManager::Dispatcher().enqueue<Events::XOCompat>({});
+                  break;
+              }
+
+              EventManager::Dispatcher().enqueue(Events::SavePrefs());
+            }
+          }
+
+          ImGui::Separator();
+
+          if (ImGui::BeginMenu("Quirks")) {
+            for (auto &entry: m_QuirkEntries) {
+              if (ImGui::MenuItem(entry.label.c_str(), nullptr, &(entry.set))) {
+                EventManager::Dispatcher().enqueue<Events::SetQuirk>({entry.quirk, entry.set});
+                EventManager::Dispatcher().enqueue(Events::SavePrefs());
+              }
+            }
+
+            ImGui::EndMenu();
+          }
+          ImGui::EndMenu();
+        }
+
+        auto drawPalette = [](const std::vector<Color> &pal) {
+          float sz = ImGui::GetTextLineHeight();
+          ImVec2 p = ImGui::GetCursorScreenPos();
+
+          for (auto i = 1; i <= 4; i++) {
+            ImGui::GetWindowDrawList()->AddRectFilled(p,
+                                                      ImVec2(p.x + sz, p.y + sz),
+                                                      IM_COL32(
+                                                          pal[i - 1].r,
+                                                          pal[i - 1].g,
+                                                          pal[i - 1].b,
+                                                          pal[i - 1].a
+                                                      ));
+
+            p.x += sz + 4.0f;
+          }
+          ImGui::Dummy(ImVec2(sz * 5, sz));
+          ImGui::SameLine();
+        };
+
+        auto &currentPalette = bus.m_Display.Palette();
+
+        if (ImGui::BeginMenu("Colors")) {
+          uint8_t index = 0;
+
+          for (const auto &entry: m_PaletteEntries) {
+            drawPalette(entry.palette);
+            if (ImGui::MenuItem(entry.name.c_str(), nullptr, m_PaletteState[index++])) {
+              EnablePalette(index - 1);
+              EventManager::Dispatcher().trigger<Events::SetPalette>(Events::SetPalette{entry.palette});
+              EventManager::Dispatcher().enqueue(Events::SavePrefs());
+            }
+          }
+
+          ImGui::Separator();
+
+          drawPalette(currentPalette);
+          if (ImGui::MenuItem("Set Colors...", nullptr, m_PaletteState[8])) {
+            m_ShowColorEditor = true;
+            EnablePalette(8);
+          }
+
+          ImGui::EndMenu();
+        }
+
+        ImGui::EndMenu();
+      }
+
+      if (ImGui::BeginMenu("Development")) {
+        ImGui::MenuItem("Code Editor", nullptr, &m_ShowCodeEditor);
+        ImGui::EndMenu();
+      }
+
+      if (ImGui::BeginMenu("Tools")) {
+        if (ImGui::BeginMenu("CPU")) {
+          ImGui::MenuItem("Registers", nullptr, &m_ShowRegisters);
+          ImGui::MenuItem("Disassembly", nullptr, &m_ShowDisassembly);
+          ImGui::EndMenu();
+        }
+        ImGui::MenuItem("Memory Viewer", nullptr, &m_ShowMemory);
+        ImGui::MenuItem("Audio Viewer", nullptr, &m_ShowAudio);
+        ImGui::Separator();
+        ImGui::MenuItem("ImGui Demo", nullptr, &m_ShowDemo);
+        ImGui::EndMenu();
+      }
+      ImGui::EndMenuBar();
+    }
+
+  }
 
 } // dorito
