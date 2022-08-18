@@ -102,7 +102,7 @@ add_executable(${PROJECT_NAME}
     src/external/zep/ZepEditor.cpp
     src/external/zep/ZepEditor.h
     src/external/zep/mode_repl.cpp
-    src/external/zep/mode_repl.h src/common/Preferences.cpp src/common/Preferences.h)
+    src/external/zep/mode_repl.h src/common/Preferences.cpp src/common/Preferences.h src/external/octo_compiler.c)
 
 # Compile Options
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)

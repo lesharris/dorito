@@ -6,6 +6,9 @@
 
 #include "system/Bus.h"
 
+#include "external/octo_compiler.h"
+
+
 namespace dorito {
   void UI::OnAttach() {
     ImGui::CreateContext(nullptr);
