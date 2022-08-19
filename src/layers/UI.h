@@ -175,11 +175,6 @@ namespace dorito {
             false
         },
         {
-            "load and store operations leave i unchanged",
-            Chip8::Quirk::LoadStore,
-            false
-        },
-        {
             "4 high bits of target address determines the offset register of jump0 instead of v0.",
             Chip8::Quirk::Jump,
             false
