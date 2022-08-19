@@ -5,6 +5,8 @@
 #include "zep/regress.h"
 #include "zep/imgui/display_imgui.h"
 
+#include "code/ZepSyntaxOcto.h"
+
 namespace dorito {
   CodeEditor::CodeEditor(const std::string &name)
       : m_editor(std::make_unique<Zep::ZepEditor>(new Zep::ZepDisplay_ImGui(), Zep::ZepPath(""))) {
@@ -17,11 +19,7 @@ namespace dorito {
     config.autoHideCommandRegion = false;
     config.showNormalModeKeyStrokes = true;
 
-    // Repl
-    Zep::ZepReplExCommand::Register(*m_editor, this);
-    Zep::ZepReplEvaluateOuterCommand::Register(*m_editor, this);
-    Zep::ZepReplEvaluateInnerCommand::Register(*m_editor, this);
-    Zep::ZepReplEvaluateCommand::Register(*m_editor, this);
+    ZepSyntaxOcto::registerSyntax(m_editor);
 
     m_editor->InitWithText(name, "\n");
     m_editor->SetGlobalMode(Zep::ZepMode_Standard::StaticName());
@@ -120,6 +118,7 @@ namespace dorito {
       if (io.KeyShift) {
         mod |= Zep::ModifierKey::Shift;
       }
+      bool super = io.KeySuper;
 
       auto pWindow = m_editor->GetActiveTabWindow()->GetActiveWindow();
       const auto &buffer = pWindow->GetBuffer();
@@ -179,6 +178,12 @@ namespace dorito {
         } else if (ImGui::IsKeyPressed('2')) {
           m_editor->SetGlobalMode(Zep::ZepMode_Vim::StaticName());
           handled = true;
+        } else if (ImGui::IsKeyPressed('V')) {
+          auto pos = m_editor->GetActiveBuffer()->GetLastEditLocation();
+          Zep::ChangeRecord changeRecord;
+          m_editor->GetActiveBuffer()->Insert(pos, ImGui::GetClipboardText(), changeRecord);
+          // m_editor->GetActiveWindow()->SetBufferCursor(changeRecord.itrEnd - 1);
+          handled = true;
         } else {
           for (int ch = 'A'; ch <= 'Z'; ch++) {
             if (ImGui::IsKeyPressed(ch)) {
@@ -203,75 +208,9 @@ namespace dorito {
         }
       }
     } else {
+      // Don't blink the cursor if not focused.
       m_editor->ResetCursorTimer();
     }
-  }
-
-  std::string CodeEditor::ReplParse(Zep::ZepBuffer &buffer, const Zep::GlyphIterator &cursorOffset,
-                                    Zep::ReplParseType type) {
-    ZEP_UNUSED(cursorOffset);
-    ZEP_UNUSED(type);
-
-    Zep::GlyphRange range;
-    if (type == Zep::ReplParseType::OuterExpression) {
-      range = buffer.GetExpression(Zep::ExpressionType::Outer, cursorOffset, {'('}, {')'});
-    } else if (type == Zep::ReplParseType::SubExpression) {
-      range = buffer.GetExpression(Zep::ExpressionType::Inner, cursorOffset, {'('}, {')'});
-    } else {
-      range = Zep::GlyphRange(buffer.Begin(), buffer.End());
-    }
-
-    if (range.first >= range.second) return "<No Expression>";
-
-    const auto &text = buffer.GetWorkingBuffer();
-    auto eval = std::string(text.begin() + range.first.Index(), text.begin() + range.second.Index());
-
-    // Flash the evaluated expression
-    Zep::FlashType flashType = Zep::FlashType::Flash;
-    float time = 1.0f;
-    buffer.BeginFlash(time, flashType, range);
-
-    //    auto ret = chibi_repl(scheme, NULL, eval);
-    //    ret = RTrim(ret);
-
-    //    GetEditor().SetCommandText(ret);
-    //    return ret;
-
-    return "";
-  }
-
-  std::string CodeEditor::ReplParse(const std::string &str) {
-    //    auto ret = chibi_repl(scheme, NULL, str);
-    //    ret = RTrim(ret);
-    //    return ret;
-    return "";
-  }
-
-  bool CodeEditor::ReplIsFormComplete(const std::string &str, int &indent) {
-    int count = 0;
-    for (auto &ch: str) {
-      if (ch == '(') count++;
-      if (ch == ')') count--;
-    }
-
-    if (count < 0) {
-      indent = -1;
-      return false;
-    } else if (count == 0) {
-      return true;
-    }
-
-    int count2 = 0;
-    indent = 1;
-    for (auto &ch: str) {
-      if (ch == '(') count2++;
-      if (ch == ')') count2--;
-      if (count2 == count) {
-        break;
-      }
-      indent++;
-    }
-    return false;
   }
 
   void CodeEditor::Notify(std::shared_ptr<Zep::ZepMessage> message) {
@@ -280,6 +219,8 @@ namespace dorito {
       message->handled = true;
     } else if (message->messageId == Zep::Msg::SetClipBoard) {
       ImGui::SetClipboardText(message->str.c_str());
+      message->handled = true;
+    } else if (message->messageId == Zep::Msg::RequestQuit) {
       message->handled = true;
     }
   }

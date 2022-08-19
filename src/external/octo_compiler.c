@@ -29,6 +29,12 @@
 *
 **/
 
+double octo_sign(double x) { return x < 0 ? -1 : x > 0 ? 1 : 0; }
+
+double octo_max(double x, double y) { return x < y ? y : x; }
+
+double octo_min(double x, double y) { return x < y ? x : y; }
+
 void octo_list_init(octo_list *list) {
   list->count = 0;
   list->space = OCTO_LIST_BLOCK_SIZE;

@@ -8,7 +8,6 @@
 
 #include "external/octo_compiler.h"
 
-
 namespace dorito {
   void UI::OnAttach() {
     ImGui::CreateContext(nullptr);
@@ -759,12 +758,54 @@ namespace dorito {
   }
 
   void UI::Code() {
-    if (!ImGui::Begin("Code", &m_ShowCodeEditor)) {
-      ImGui::End();
-    } else {
-      m_Editor.draw();
-      ImGui::End();
+    static octo_program *program = nullptr;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+    ImGui::Begin("Code", &m_ShowCodeEditor, ImGuiWindowFlags_MenuBar);
+
+    if (ImGui::BeginMenuBar()) {
+      if (ImGui::BeginMenu("File")) {
+        if (ImGui::BeginMenu("Open")) {
+          ImGui::EndMenu();
+        }
+        ImGui::MenuItem("Close All Documents", nullptr);
+
+        ImGui::MenuItem("Exit", "Ctrl+F4");
+
+        ImGui::EndMenu();
+      }
+
+      if (ImGui::BeginMenu("Code")) {
+        if (ImGui::MenuItem("Compile", nullptr)) {
+          if (program) {
+            octo_free_program(program);
+          }
+
+          auto code = m_Editor.getText();
+          spdlog::get("console")->info("{}", code);
+          char *source = (char *) malloc(sizeof(char) * code.size());
+          memcpy(source, code.c_str(), code.size());
+
+          program = octo_compile_str(source);
+        }
+
+        ImGui::EndMenu();
+      }
+      ImGui::EndMenuBar();
     }
+
+    m_Editor.draw();
+
+    if (program) {
+      static MemoryEditor compiledRom;
+
+      compiledRom.DrawWindow("Compiled Rom", program->rom, 1024 * 64);
+    }
+
+    ImGui::End();
+
+    ImGui::PopStyleVar();
   }
 
   /*

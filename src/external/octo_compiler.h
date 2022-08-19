@@ -17,6 +17,10 @@
 *  https://github.com/JohnEarnest/c-octo/blob/main/src/octo_compiler.h
 **/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,11 +39,11 @@
 #define OCTO_ERR_MAX         4096
 #define OCTO_DESTRUCTOR(x) ((void(*)(void*))x)
 
-double octo_sign(double x) { return x < 0 ? -1 : x > 0 ? 1 : 0; }
+double octo_sign(double x);
 
-double octo_max(double x, double y) { return x < y ? y : x; }
+double octo_max(double x, double y);
 
-double octo_min(double x, double y) { return x < y ? x : y; }
+double octo_min(double x, double y);
 
 typedef struct {
   int count, space;
@@ -151,3 +155,7 @@ typedef struct {
 void octo_free_program(octo_program *p);
 
 octo_program *octo_compile_str(char *text);
+
+#ifdef __cplusplus
+}
+#endif

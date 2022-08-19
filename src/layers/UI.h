@@ -319,7 +319,7 @@ namespace dorito {
 
     uint16_t m_PrevPC = 0;
 
-    CodeEditor m_Editor{"Code"};
+    CodeEditor m_Editor{"Code.o8"};
   };
 
 } // dorito

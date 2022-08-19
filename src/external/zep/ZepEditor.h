@@ -13,7 +13,7 @@
 #include "zep/window.h"
 
 namespace dorito {
-  class CodeEditor final : public Zep::IZepComponent, public Zep::IZepReplProvider {
+  class CodeEditor final : public Zep::IZepComponent {
   public:
     CodeEditor(const std::string &name);
 
@@ -51,13 +51,6 @@ namespace dorito {
     std::unique_ptr<Zep::ZepEditor> m_editor;
     std::optional<decltype(m_editor->GetMRUBuffer()->GetLastUpdateTime())> m_lastUpdateTime;
     std::optional<float> m_dpiScale;
-
-    virtual std::string ReplParse(Zep::ZepBuffer &buffer, const Zep::GlyphIterator &cursorOffset,
-                                  Zep::ReplParseType type) override;
-
-    virtual std::string ReplParse(const std::string &str) override;
-
-    virtual bool ReplIsFormComplete(const std::string &str, int &indent) override;
 
     virtual void Notify(std::shared_ptr<Zep::ZepMessage> message) override;
   };

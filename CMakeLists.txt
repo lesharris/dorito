@@ -90,6 +90,12 @@ add_executable(${PROJECT_NAME}
     src/external/imgui/imgui_widgets.cpp
     src/external/imgui/imgui.cpp
     src/external/imgui_extra/imgui_memory_editor.h
+    src/external/zep/ZepEditor.cpp
+    src/external/zep/ZepEditor.h
+    src/external/zep/mode_repl.cpp
+    src/external/zep/mode_repl.h
+    src/external/octo_compiler.h
+    src/external/octo_compiler.c
     src/common/common.cpp
     src/cpu/Chip8.cpp
     src/cpu/Chip8.h
@@ -99,10 +105,11 @@ add_executable(${PROJECT_NAME}
     src/system/Bus.h
     src/display/Display.cpp
     src/display/Display.h
-    src/external/zep/ZepEditor.cpp
-    src/external/zep/ZepEditor.h
-    src/external/zep/mode_repl.cpp
-    src/external/zep/mode_repl.h src/common/Preferences.cpp src/common/Preferences.h src/external/octo_compiler.c)
+    src/common/Preferences.cpp
+    src/common/Preferences.h
+    src/external/zep/dorito_vim_mode.h
+    src/code/ZepSyntaxOcto.cpp
+    src/code/ZepSyntaxOcto.h)
 
 # Compile Options
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
