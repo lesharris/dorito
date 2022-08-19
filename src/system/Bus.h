@@ -92,7 +92,27 @@ namespace dorito {
       m_Ram.UseBeep(use);
     }
 
+    void Muted(bool isMuted) {
+      m_Muted = isMuted;
+    }
+
   public:
+    Display &GetDisplay() {
+      return m_Display;
+    }
+
+    Chip8 &GetCpu() {
+      return m_Cpu;
+    }
+
+    Memory &GetRam() {
+      return m_Ram;
+    }
+
+    [[nodiscard]] bool Muted() const {
+      return m_Muted;
+    }
+
     [[nodiscard]] uint8_t DisplayWidth() const {
       return m_Display.Width();
     }

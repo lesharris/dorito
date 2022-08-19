@@ -42,6 +42,18 @@ namespace dorito {
       m_UseBeep = use;
     }
 
+    std::deque<uint16_t> &GetStack() {
+      return m_Stack;
+    }
+
+    std::vector<uint8_t> &GetMemory() {
+      return m_Ram;
+    }
+
+    std::vector<uint8_t> &GetAudioBuffer() {
+      return m_AudioBuffer;
+    }
+    
   private:
     void LoadFont();
 

@@ -252,7 +252,11 @@ namespace dorito {
     void ProcAudio();
 
   private:
-    friend class UI;
+    friend class RegistersWidget;
+
+    friend class DisassemblyWidget;
+
+    friend class AudioWidget;
 
     friend class Bus;
 

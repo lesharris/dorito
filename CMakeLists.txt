@@ -109,7 +109,7 @@ add_executable(${PROJECT_NAME}
     src/common/Preferences.h
     src/external/zep/dorito_vim_mode.h
     src/code/ZepSyntaxOcto.cpp
-    src/code/ZepSyntaxOcto.h)
+    src/code/ZepSyntaxOcto.h src/widgets/EditorWidget.cpp src/widgets/EditorWidget.h src/widgets/Widget.h src/widgets/MainMenuWidget.cpp src/widgets/MainMenuWidget.h src/widgets/RegistersWidget.cpp src/widgets/RegistersWidget.h src/widgets/DisassemblyWidget.cpp src/widgets/DisassemblyWidget.h src/widgets/AudioWidget.cpp src/widgets/AudioWidget.h src/widgets/ColorEditorWidget.cpp src/widgets/ColorEditorWidget.h src/widgets/MemoryEditorWidget.cpp src/widgets/MemoryEditorWidget.h src/widgets/ViewportWidget.cpp src/widgets/ViewportWidget.h)
 
 # Compile Options
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)

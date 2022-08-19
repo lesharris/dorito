@@ -211,4 +211,15 @@ namespace dorito::Events {
 
     const char *rom;
   };
+
+  struct UIResetPC : public Event {
+    UIResetPC() : Event() {}
+  };
+
+  struct UISetWidgetEnabled : public Event {
+    UISetWidgetEnabled(const std::string &name, bool isEnabled) : Event(), name(name), enabled(isEnabled) {}
+
+    bool enabled;
+    std::string name;
+  };
 }
