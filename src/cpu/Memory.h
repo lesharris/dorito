@@ -50,10 +50,6 @@ namespace dorito {
       return m_Ram;
     }
 
-    std::vector<uint8_t> &GetAudioBuffer() {
-      return m_AudioBuffer;
-    }
-    
   private:
     void LoadFont();
 

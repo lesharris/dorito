@@ -14,8 +14,18 @@ namespace dorito {
     std::string Name() override { return "Editor"; };
 
   private:
+    bool OpenFile();
+
+    bool SaveFile();
+
+    bool SaveRom();
+
+    void Compile();
+
+  private:
     CodeEditor m_Editor{"Code.o8"};
-    std::string m_SourceFile;
+    Zep::ZepPath m_Path;
+    octo_program *m_Program = nullptr;
   };
 
 } // dorito
