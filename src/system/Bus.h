@@ -177,6 +177,8 @@ namespace dorito {
 
     void HandleSetMute(const Events::SetMute &event);
 
+    void HandleRunCode(const Events::RunCode &event);
+
   private:
     friend class UI;
 

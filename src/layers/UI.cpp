@@ -3,6 +3,7 @@
 
 #include <zep.h>
 #include <nfd.h>
+#include <raylib.h>
 
 #include "system/Bus.h"
 
@@ -766,20 +767,66 @@ namespace dorito {
 
     if (ImGui::BeginMenuBar()) {
       if (ImGui::BeginMenu("File")) {
-        if (ImGui::BeginMenu("Open")) {
-          ImGui::EndMenu();
+        if (ImGui::MenuItem("New", nullptr)) {
+          m_Editor.setText("");
         }
-        ImGui::MenuItem("Close All Documents", nullptr);
 
-        ImGui::MenuItem("Exit", "Ctrl+F4");
+        ImGui::Separator();
+        if (ImGui::MenuItem("Open...", nullptr)) {
+          nfdchar_t *outPath = nullptr;
 
+          nfdresult_t result = NFD_OpenDialog("o8", nullptr, &outPath);
+
+          switch (result) {
+            case NFD_OKAY: {
+              std::string path{outPath};
+              m_SourceFile = path;
+              auto fileText = LoadFileText(outPath);
+              std::string file{fileText};
+              UnloadFileText(fileText);
+
+              m_Editor.setText(file);
+
+              delete outPath;
+            }
+              break;
+            case NFD_CANCEL:
+              break;
+            case NFD_ERROR:
+              spdlog::get("console")->error("{}", NFD_GetError());
+              break;
+          }
+        }
+
+        ImGui::MenuItem("Save", nullptr);
         ImGui::EndMenu();
       }
 
       if (ImGui::BeginMenu("Code")) {
+        if (ImGui::MenuItem("Run", nullptr)) {
+          if (program) {
+            octo_free_program(program);
+            program = nullptr;
+          }
+
+          auto code = m_Editor.getText();
+          spdlog::get("console")->info("{}", code);
+          char *source = (char *) malloc(sizeof(char) * code.size());
+          memcpy(source, code.c_str(), code.size());
+
+          program = octo_compile_str(source);
+
+
+          auto viewport = ImGui::FindWindowByName("Viewport");
+          ImGui::FocusWindow(viewport);
+
+          EventManager::Dispatcher().enqueue<Events::RunCode>(program->rom);
+        }
+
         if (ImGui::MenuItem("Compile", nullptr)) {
           if (program) {
             octo_free_program(program);
+            program = nullptr;
           }
 
           auto code = m_Editor.getText();

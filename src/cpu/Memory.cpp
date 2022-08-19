@@ -39,6 +39,15 @@ namespace dorito {
     }
   }
 
+  void Memory::LoadRom(const char *rom) {
+    Reset();
+
+    uint16_t addr = 0x200;
+
+    for (auto i = 0; i < 1024 * 64; i++) {
+      m_Ram[addr + i] = rom[addr + i];
+    }
+  }
 
   void Memory::Reset() {
     memset(&m_Ram[0], 0, m_MemorySize);

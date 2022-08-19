@@ -320,6 +320,8 @@ namespace dorito {
     uint16_t m_PrevPC = 0;
 
     CodeEditor m_Editor{"Code.o8"};
+
+    std::string m_SourceFile;
   };
 
 } // dorito

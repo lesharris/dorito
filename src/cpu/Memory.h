@@ -16,6 +16,8 @@ namespace dorito {
 
     void LoadRom(const std::string &path);
 
+    void LoadRom(const char *rom);
+
     void Push(uint16_t addr);
 
     uint16_t Pop();

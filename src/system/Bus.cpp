@@ -78,6 +78,11 @@ namespace dorito {
         &Bus::HandleSetMute
     >(this);
 
+    EventManager::Get().Attach<
+        Events::RunCode,
+        &Bus::HandleRunCode
+    >(this);
+
     m_Sound = LoadAudioStream(44100, 32, 1);
     SetAudioStreamCallback(m_Sound, &Bus::AudioCallback);
     AttachAudioStreamProcessor(m_Sound, &Bus::LowpassFilterCallback);
@@ -494,6 +499,26 @@ namespace dorito {
     SetQuirk(event.quirk, event.value);
   }
 
+  void Bus::HandleSetMute(const Events::SetMute &event) {
+    m_Muted = event.isSet;
+
+    if (m_Muted && IsAudioStreamPlaying(m_Sound)) {
+      StopAudioStream(m_Sound);
+    }
+
+    SavePrefs();
+  }
+
+  void Bus::HandleRunCode(const Events::RunCode &event) {
+    m_Cpu.Reset();
+    m_Display.Reset();
+    m_Ram.Reset();
+    m_Ram.LoadRom(event.rom);
+
+    m_Cpu.Halted(false);
+    m_Running = true;
+  }
+
   void Bus::AudioCallback(void *buffer, uint32_t frames) {
     static uint32_t cursor = 0;
     std::vector<float> bits;
@@ -619,16 +644,6 @@ namespace dorito {
 
       UnloadFileText(prefs);
     }
-  }
-
-  void Bus::HandleSetMute(const Events::SetMute &event) {
-    m_Muted = event.isSet;
-
-    if (m_Muted && IsAudioStreamPlaying(m_Sound)) {
-      StopAudioStream(m_Sound);
-    }
-
-    SavePrefs();
   }
 
 } // dorito

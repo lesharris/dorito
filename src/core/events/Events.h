@@ -205,4 +205,10 @@ namespace dorito::Events {
 
     bool isSet;
   };
+
+  struct RunCode : public Event {
+    explicit RunCode(const char *rom) : Event(), rom(rom) {}
+
+    const char *rom;
+  };
 }
