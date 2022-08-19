@@ -786,6 +786,8 @@ namespace dorito {
               UnloadFileText(fileText);
 
               m_Editor.setText(file);
+              m_Editor.GetEditor().GetActiveBuffer()->SetFilePath(path);
+              m_Editor.GetEditor().GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
 
               delete outPath;
             }
@@ -798,7 +800,38 @@ namespace dorito {
           }
         }
 
-        ImGui::MenuItem("Save", nullptr);
+        if (ImGui::MenuItem("Save", nullptr)) {
+          if (m_SourceFile.empty()) {
+            nfdchar_t *outPath = nullptr;
+
+            nfdresult_t result = NFD_SaveDialog("o8", nullptr, &outPath);
+
+            switch (result) {
+              case NFD_OKAY: {
+                std::string path{outPath};
+                m_SourceFile = path;
+
+                SaveFileText(m_SourceFile.c_str(), (char *) m_Editor.getText().c_str());
+
+                m_Editor.GetEditor().GetActiveBuffer()->SetFilePath(path);
+                m_Editor.GetEditor().GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
+
+                delete outPath;
+              }
+                break;
+              case NFD_CANCEL:
+                break;
+              case NFD_ERROR:
+                spdlog::get("console")->error("{}", NFD_GetError());
+                break;
+            }
+
+          } else {
+            SaveFileText(m_SourceFile.c_str(), (char *) m_Editor.getText().c_str());
+            m_Editor.GetEditor().GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
+          }
+        }
+
         ImGui::EndMenu();
       }
 
@@ -810,12 +843,10 @@ namespace dorito {
           }
 
           auto code = m_Editor.getText();
-          spdlog::get("console")->info("{}", code);
           char *source = (char *) malloc(sizeof(char) * code.size());
           memcpy(source, code.c_str(), code.size());
 
           program = octo_compile_str(source);
-
 
           auto viewport = ImGui::FindWindowByName("Viewport");
           ImGui::FocusWindow(viewport);
@@ -830,7 +861,6 @@ namespace dorito {
           }
 
           auto code = m_Editor.getText();
-          spdlog::get("console")->info("{}", code);
           char *source = (char *) malloc(sizeof(char) * code.size());
           memcpy(source, code.c_str(), code.size());
 
@@ -839,6 +869,7 @@ namespace dorito {
 
         ImGui::EndMenu();
       }
+
       ImGui::EndMenuBar();
     }
 

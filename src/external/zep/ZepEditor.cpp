@@ -182,7 +182,6 @@ namespace dorito {
           auto pos = m_editor->GetActiveBuffer()->GetLastEditLocation();
           Zep::ChangeRecord changeRecord;
           m_editor->GetActiveBuffer()->Insert(pos, ImGui::GetClipboardText(), changeRecord);
-          // m_editor->GetActiveWindow()->SetBufferCursor(changeRecord.itrEnd - 1);
           handled = true;
         } else {
           for (int ch = 'A'; ch <= 'Z'; ch++) {
