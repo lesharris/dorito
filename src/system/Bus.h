@@ -96,6 +96,8 @@ namespace dorito {
       m_Muted = isMuted;
     }
 
+    void AddRecentSourceFile(const std::string &path);
+
   public:
     Display &GetDisplay() {
       return m_Display;
@@ -107,6 +109,14 @@ namespace dorito {
 
     Memory &GetRam() {
       return m_Ram;
+    }
+
+    [[nodiscard]] const std::vector<std::string> &RecentRoms() const {
+      return m_RecentRoms;
+    }
+
+    [[nodiscard]] const std::vector<std::string> &RecentSourceFiles() const {
+      return m_RecentSourceFiles;
     }
 
     [[nodiscard]] bool Muted() const {
@@ -199,6 +209,12 @@ namespace dorito {
 
     void HandleRunCode(const Events::RunCode &event);
 
+    void HandleClearRecents(const Events::UIClearRecents &event);
+
+    void HandleClearRecentSources(const Events::UIClearRecentSources &event);
+
+    void HandleAddRecentSourceFile(const Events::UIAddRecentSourceFile &event);
+
   private:
     friend class UI;
 
@@ -220,6 +236,9 @@ namespace dorito {
     DoritoPrefs m_Prefs;
 
     AudioStream m_Sound;
+
+    std::vector<std::string> m_RecentRoms;
+    std::vector<std::string> m_RecentSourceFiles;
   };
 
 

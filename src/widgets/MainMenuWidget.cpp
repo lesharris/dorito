@@ -68,6 +68,32 @@ namespace dorito {
           }
         }
 
+        auto &paths = bus.RecentRoms();
+
+        if (ImGui::BeginMenu("Open Recent...", paths.size() != 0)) {
+          for (auto it = paths.rbegin(); it != paths.rend(); it++) {
+            auto romPath = *it;
+
+            Zep::ZepPath path{romPath};
+
+            auto name = fmt::format("{}{}", path.stem().c_str(), path.extension().c_str());
+
+            if (ImGui::MenuItem(name.c_str(), nullptr)) {
+              EventManager::Dispatcher().enqueue<Events::UIResetPC>();
+              EventManager::Dispatcher().enqueue<Events::LoadROM>({path});
+            }
+          }
+
+          ImGui::Separator();
+
+          if (ImGui::MenuItem("Clear Recents")) {
+            EventManager::Dispatcher().trigger<Events::UIClearRecents>();
+          }
+
+
+          ImGui::EndMenu();
+        }
+
         ImGui::Separator();
 
         if (ImGui::MenuItem("Unload ROM")) {
@@ -195,6 +221,9 @@ namespace dorito {
 
       if (ImGui::BeginMenu("Development")) {
         ImGui::MenuItem("Code Editor", nullptr, &UI::ShowCodeEditor);
+        ImGui::Separator();
+        ImGui::MenuItem("Sprite Editor", nullptr, &UI::ShowSpriteEditor);
+        ImGui::MenuItem("Sound Editor", nullptr, &UI::ShowSoundEditor);
         ImGui::EndMenu();
       }
 

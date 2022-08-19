@@ -14,7 +14,7 @@ namespace dorito {
     std::string Name() override { return "Editor"; };
 
   private:
-    bool OpenFile();
+    bool OpenFile(const std::string &path = "");
 
     bool SaveFile();
 

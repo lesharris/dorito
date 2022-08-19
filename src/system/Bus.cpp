@@ -83,6 +83,21 @@ namespace dorito {
         &Bus::HandleRunCode
     >(this);
 
+    EventManager::Get().Attach<
+        Events::UIClearRecents,
+        &Bus::HandleClearRecents
+    >(this);
+
+    EventManager::Get().Attach<
+        Events::UIClearRecentSources,
+        &Bus::HandleClearRecentSources
+    >(this);
+
+    EventManager::Get().Attach<
+        Events::UIAddRecentSourceFile,
+        &Bus::HandleAddRecentSourceFile
+    >(this);
+
     m_Sound = LoadAudioStream(44100, 32, 1);
     SetAudioStreamCallback(m_Sound, &Bus::AudioCallback);
     AttachAudioStreamProcessor(m_Sound, &Bus::LowpassFilterCallback);
@@ -155,6 +170,33 @@ namespace dorito {
 
     m_Running = false;
 
+    m_RecentRoms.push_back(path);
+    std::vector<std::string> roms;
+
+    auto contains = [&](const std::string &romPath) {
+      auto it = std::find_if(roms.begin(), roms.end(),
+                             [romPath](const std::string &name) {
+                               return name == romPath;
+                             });
+
+
+      return it != std::end(roms);
+    };
+
+    uint8_t count = 0;
+    for (const auto &romPath: m_RecentRoms) {
+      if (!contains(romPath)) {
+        roms.push_back(romPath);
+        count++;
+      }
+
+      if (count >= 10)
+        break;
+    }
+
+    m_RecentRoms = roms;
+
+    SavePrefs();
     LoadGamePrefs();
   }
 
@@ -519,6 +561,20 @@ namespace dorito {
     m_Running = true;
   }
 
+  void Bus::HandleClearRecents(const Events::UIClearRecents &) {
+    m_RecentRoms.clear();
+    SavePrefs();
+  }
+
+  void Bus::HandleClearRecentSources(const Events::UIClearRecentSources &event) {
+    m_RecentSourceFiles.clear();
+    SavePrefs();
+  }
+
+  void Bus::HandleAddRecentSourceFile(const Events::UIAddRecentSourceFile &event) {
+    AddRecentSourceFile(event.path);
+  }
+
   void Bus::AudioCallback(void *buffer, uint32_t frames) {
     static uint32_t cursor = 0;
     std::vector<float> bits;
@@ -626,6 +682,8 @@ namespace dorito {
 
   void Bus::SavePrefs() {
     m_Prefs.isMuted = m_Muted;
+    m_Prefs.recentRoms = m_RecentRoms;
+    m_Prefs.recentSourceFiles = m_RecentSourceFiles;
 
     json prefs = m_Prefs;
 
@@ -641,9 +699,40 @@ namespace dorito {
       m_Prefs = nlohmann::json::parse(prefs);
 
       m_Muted = m_Prefs.isMuted;
+      m_RecentRoms = m_Prefs.recentRoms;
+      m_RecentSourceFiles = m_Prefs.recentSourceFiles;
 
       UnloadFileText(prefs);
     }
+  }
+
+  void Bus::AddRecentSourceFile(const std::string &path) {
+    m_RecentSourceFiles.push_back(path);
+    std::vector<std::string> sourceFiles;
+
+    auto contains = [&](const std::string &sourceFilePath) {
+      auto it = std::find_if(sourceFiles.begin(), sourceFiles.end(),
+                             [sourceFilePath](const std::string &name) {
+                               return name == sourceFilePath;
+                             });
+
+
+      return it != std::end(sourceFiles);
+    };
+
+    uint8_t count = 0;
+    for (const auto &romPath: m_RecentSourceFiles) {
+      if (!contains(romPath)) {
+        sourceFiles.push_back(romPath);
+        count++;
+      }
+
+      if (count >= 10)
+        break;
+    }
+
+    m_RecentSourceFiles = sourceFiles;
+    SavePrefs();
   }
 
 } // dorito

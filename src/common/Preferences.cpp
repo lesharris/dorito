@@ -16,11 +16,22 @@ void from_json(const json &j, Color &c) {
 
 namespace dorito {
   void to_json(json &j, const DoritoPrefs &dp) {
-    j = json{{"isMuted", dp.isMuted}};
+    j = json{{"isMuted",           dp.isMuted},
+             {"recentRoms",        dp.recentRoms},
+             {"recentSourceFiles", dp.recentSourceFiles}};
   }
 
   void from_json(const json &j, DoritoPrefs &dp) {
-    j.at("isMuted").get_to(dp.isMuted);
+    if (j.contains("isMuted"))
+      j.at("isMuted").get_to(dp.isMuted);
+    else
+      dp.isMuted = false;
+
+    if (j.contains("recentRoms"))
+      j.at("recentRoms").get_to(dp.recentRoms);
+
+    if (j.contains("recentSourceFiles"))
+      j.at("recentSourceFiles").get_to(dp.recentSourceFiles);
   }
 
   void to_json(json &j, const GamePrefs &gp) {

@@ -217,9 +217,23 @@ namespace dorito::Events {
   };
 
   struct UISetWidgetEnabled : public Event {
-    UISetWidgetEnabled(const std::string &name, bool isEnabled) : Event(), name(name), enabled(isEnabled) {}
+    UISetWidgetEnabled(const std::string &name, bool isEnabled) : Event(), enabled(isEnabled), name(name) {}
 
     bool enabled;
     std::string name;
+  };
+
+  struct UIClearRecents : public Event {
+    UIClearRecents() : Event() {}
+  };
+
+  struct UIClearRecentSources : public Event {
+    UIClearRecentSources() : Event() {}
+  };
+
+  struct UIAddRecentSourceFile : public Event {
+    UIAddRecentSourceFile(const std::string &path) : Event(), path(path) {}
+
+    std::string path;
   };
 }

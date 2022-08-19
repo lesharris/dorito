@@ -20,6 +20,9 @@ namespace dorito {
 
   struct DoritoPrefs {
     bool isMuted;
+
+    std::vector<std::string> recentRoms;
+    std::vector<std::string> recentSourceFiles;
   };
 
   void to_json(json &j, const DoritoPrefs &dp);

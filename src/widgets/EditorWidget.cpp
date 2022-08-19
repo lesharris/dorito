@@ -7,10 +7,13 @@
 
 namespace dorito {
   void EditorWidget::Draw() {
+    auto &bus = Bus::Get();
+
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
     ImGui::Begin("Code", &UI::ShowCodeEditor, ImGuiWindowFlags_MenuBar);
 
+    ImGui::PopStyleVar();
     if (ImGui::BeginMenuBar()) {
       if (ImGui::BeginMenu("File")) {
         if (ImGui::MenuItem("New", nullptr)) {
@@ -27,6 +30,30 @@ namespace dorito {
         if (ImGui::MenuItem("Open...", nullptr)) {
           OpenFile();
         }
+
+        auto &paths = bus.RecentSourceFiles();
+
+        if (ImGui::BeginMenu("Open Recent...", paths.size() != 0)) {
+
+          for (const auto &path: paths) {
+            auto zpath = Zep::ZepPath{path};
+            auto filepath = fmt::format("{}{}", zpath.stem().c_str(), zpath.extension().c_str());
+
+            if (ImGui::MenuItem(filepath.c_str(), nullptr)) {
+              OpenFile(path);
+            }
+          }
+
+          ImGui::Separator();
+
+          if (ImGui::MenuItem("Clear Recents", nullptr)) {
+            EventManager::Dispatcher().enqueue<Events::UIClearRecentSources>();
+          }
+
+          ImGui::EndMenu();
+        }
+
+        ImGui::Separator();
 
         if (ImGui::MenuItem("Save", nullptr)) {
           SaveFile();
@@ -48,6 +75,8 @@ namespace dorito {
           }
         }
 
+        ImGui::Separator();
+        
         if (ImGui::MenuItem("Compile", nullptr)) {
           if (SaveFile()) {
             Compile();
@@ -70,36 +99,45 @@ namespace dorito {
     }
 
     ImGui::End();
-
-    ImGui::PopStyleVar();
   }
 
-  bool EditorWidget::OpenFile() {
-    nfdchar_t *outPath = nullptr;
+  bool EditorWidget::OpenFile(const std::string &path) {
+    auto doOpen = [&](const std::string &filepath) {
+      m_Path = Zep::ZepPath{filepath};
+      auto fileText = LoadFileText(filepath.c_str());
+      std::string file{fileText};
+      UnloadFileText(fileText);
 
-    nfdresult_t result = NFD_OpenDialog("o8", nullptr, &outPath);
+      m_Editor.setText(file);
+      m_Editor.GetEditor().GetActiveBuffer()->SetFilePath(m_Path);
+      m_Editor.GetEditor().GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
+    };
 
-    switch (result) {
-      case NFD_OKAY: {
-        m_Path = Zep::ZepPath{outPath};
-        auto fileText = LoadFileText(outPath);
-        std::string file{fileText};
-        UnloadFileText(fileText);
+    if (path.size() != 0) {
+      doOpen(path);
+    } else {
+      nfdchar_t *outPath = nullptr;
+      nfdresult_t result = NFD_OpenDialog("o8", nullptr, &outPath);
 
-        m_Editor.setText(file);
-        m_Editor.GetEditor().GetActiveBuffer()->SetFilePath(m_Path);
-        m_Editor.GetEditor().GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
+      switch (result) {
+        case NFD_OKAY: {
 
-        delete outPath;
+          std::string filepath{outPath};
+          doOpen(filepath);
+
+          delete outPath;
+
+          EventManager::Dispatcher().enqueue<Events::UIAddRecentSourceFile>(m_Path);
+        }
+          return true;
+
+        case NFD_CANCEL:
+          return false;
+
+        case NFD_ERROR:
+          spdlog::get("console")->error("{}", NFD_GetError());
+          return false;
       }
-        return true;
-
-      case NFD_CANCEL:
-        return false;
-
-      case NFD_ERROR:
-        spdlog::get("console")->error("{}", NFD_GetError());
-        return false;
     }
 
     return false;
@@ -119,6 +157,8 @@ namespace dorito {
 
           m_Editor.GetEditor().GetActiveBuffer()->SetFilePath(m_Path);
           m_Editor.GetEditor().GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
+
+          EventManager::Dispatcher().enqueue<Events::UIAddRecentSourceFile>(m_Path);
 
           delete outPath;
 

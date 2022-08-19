@@ -25,6 +25,8 @@
 #include "widgets/MemoryEditorWidget.h"
 #include "widgets/RegistersWidget.h"
 #include "widgets/ViewportWidget.h"
+#include "widgets/SpriteEditorWidget.h"
+#include "widgets/SoundEditorWidget.h"
 
 namespace dorito {
 
@@ -53,6 +55,8 @@ namespace dorito {
     static bool ShowAudio;
     static bool ShowColorEditor;
     static bool ShowCodeEditor;
+    static bool ShowSoundEditor;
+    static bool ShowSpriteEditor;
     static uint16_t PrevPC;
 
   private:
@@ -73,6 +77,8 @@ namespace dorito {
     MemoryEditorWidget m_MemoryEditor;
     RegistersWidget m_Registers;
     ViewportWidget m_Viewport;
+    SpriteEditorWidget m_SpriteEditor;
+    SoundEditorWidget m_SoundEditor;
   };
 
 } // dorito
