@@ -20,12 +20,13 @@ namespace dorito {
 
     bool SaveRom();
 
-    void Compile();
+    bool Compile();
 
   private:
     CodeEditor m_Editor{"Code.o8"};
     Zep::ZepPath m_Path;
     octo_program *m_Program = nullptr;
+    bool m_CompiledSuccessfully = false;
   };
 
 } // dorito

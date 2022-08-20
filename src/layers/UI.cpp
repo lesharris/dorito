@@ -2,7 +2,6 @@
 #include "imgui_internal.h"
 
 #include <zep.h>
-#include <nfd.h>
 #include <raylib.h>
 
 #include "system/Bus.h"

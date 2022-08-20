@@ -65,22 +65,24 @@ namespace dorito {
       if (ImGui::BeginMenu("Code")) {
         if (ImGui::MenuItem("Run", nullptr)) {
           if (SaveFile()) {
-            Compile();
-            SaveRom();
+            if (Compile()) {
+              SaveRom();
 
-            auto viewport = ImGui::FindWindowByName("Viewport");
-            ImGui::FocusWindow(viewport);
+              auto viewport = ImGui::FindWindowByName("Viewport");
+              ImGui::FocusWindow(viewport);
 
-            EventManager::Dispatcher().enqueue<Events::RunCode>(m_Program->rom);
+              EventManager::Dispatcher().enqueue<Events::RunCode>(m_Program->rom);
+            }
           }
         }
 
         ImGui::Separator();
-        
+
         if (ImGui::MenuItem("Compile", nullptr)) {
           if (SaveFile()) {
-            Compile();
-            SaveRom();
+            if (Compile()) {
+              SaveRom();
+            }
           }
         }
 
@@ -92,7 +94,7 @@ namespace dorito {
 
     m_Editor.draw();
 
-    if (m_Program) {
+    if (m_Program && m_CompiledSuccessfully) {
       static MemoryEditor compiledRom;
 
       compiledRom.DrawWindow("Compiled Rom", m_Program->rom, 1024 * 64);
@@ -202,7 +204,7 @@ namespace dorito {
     return true;
   }
 
-  void EditorWidget::Compile() {
+  bool EditorWidget::Compile() {
     if (m_Program) {
       octo_free_program(m_Program);
       m_Program = nullptr;
@@ -216,5 +218,38 @@ namespace dorito {
     memcpy(source, code.c_str(), code.size());
 
     m_Program = octo_compile_str(source);
+
+    if (m_Program->is_error) {
+      auto &editor = m_Editor.GetEditor();
+      auto buffer = editor.GetActiveBuffer();
+      auto window = editor.GetActiveWindow();
+
+      buffer->ClearRangeMarkers(Zep::RangeMarkerType::All);
+
+      auto marker = std::make_shared<Zep::RangeMarker>(*m_Editor.GetEditor().GetActiveBuffer());
+
+      Zep::ByteRange range;
+      buffer->GetLineOffsets(m_Program->error_line, range);
+
+      marker->SetHighlightColor(Zep::ThemeColor::Error);
+      marker->SetEnabled(true);
+      marker->SetDescription(m_Program->error);
+      marker->SetName("Compilation Error");
+      marker->SetRange({range.first + m_Program->error_pos, range.first + m_Program->error_pos + 1});
+
+      buffer->AddRangeMarker(marker);
+
+      auto pos = Zep::GlyphIterator{buffer, (unsigned long) range.first + m_Program->error_pos + 1};
+      window->SetBufferCursor(pos);
+      
+      Zep::GlyphRange glyphRange{buffer, range};
+      buffer->BeginFlash(1.0f, Zep::FlashType::Flash, glyphRange);
+
+      m_CompiledSuccessfully = false;
+      return false;
+    }
+
+    m_CompiledSuccessfully = true;
+    return true;
   }
 } // dorito

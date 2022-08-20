@@ -9,7 +9,11 @@
 
 namespace dorito {
   CodeEditor::CodeEditor(const std::string &name)
-      : m_editor(std::make_unique<Zep::ZepEditor>(new Zep::ZepDisplay_ImGui(), Zep::ZepPath(""))) {
+      : m_editor(std::make_unique<Zep::ZepEditor>(
+      new Zep::ZepDisplay_ImGui(),
+      Zep::ZepPath(""),
+      0,
+      new Zep::ZepFileSystemCPP(""))) {
 
     m_editor->RegisterCallback(this);
 

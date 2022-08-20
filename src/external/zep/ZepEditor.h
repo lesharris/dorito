@@ -2,6 +2,8 @@
 
 #include <optional>
 
+#define ZEP_FEATURE_CPP_FILE_SYSTEM
+
 #include "zep/mode_repl.h"
 #include "zep/editor.h"
 #include "zep/filesystem.h"
