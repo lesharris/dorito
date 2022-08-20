@@ -17,12 +17,7 @@ namespace dorito {
     if (ImGui::BeginMenuBar()) {
       if (ImGui::BeginMenu("File")) {
         if (ImGui::MenuItem("New", nullptr)) {
-          m_Editor.setText("");
-
-          if (m_Program) {
-            octo_free_program(m_Program);
-            m_Program = nullptr;
-          }
+          NewFile();
         }
 
         ImGui::Separator();
@@ -67,10 +62,8 @@ namespace dorito {
           if (SaveFile()) {
             if (Compile()) {
               SaveRom();
-
               auto viewport = ImGui::FindWindowByName("Viewport");
               ImGui::FocusWindow(viewport);
-
               EventManager::Dispatcher().enqueue<Events::RunCode>(m_Program->rom);
             }
           }
@@ -94,6 +87,12 @@ namespace dorito {
 
     m_Editor.draw();
 
+    if (m_PromptSave) {
+      ImGui::OpenPopup("Save current file?");
+    }
+
+    ConfirmSave();
+
     if (m_Program && m_CompiledSuccessfully) {
       static MemoryEditor compiledRom;
 
@@ -103,11 +102,53 @@ namespace dorito {
     ImGui::End();
   }
 
+  void EditorWidget::NewFile() {
+    auto &editor = m_Editor.GetEditor();
+
+    auto dirty = editor.GetActiveBuffer()->HasFileFlags(Zep::FileFlags::Dirty);
+
+    if (dirty && !m_PromptSaveNew) {
+      m_PromptSave = true;
+      m_PromptSaveNew = true;
+    } else {
+      editor.RemoveBuffer(editor.GetActiveBuffer());
+      m_Editor.GetEditor().InitWithText("Code.o8", "");
+      m_Editor.GetEditor().GetActiveBuffer()->Clear();
+      m_Editor.GetEditor().GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
+
+      if (m_Program) {
+        octo_free_program(m_Program);
+        m_Program = nullptr;
+      }
+
+      m_Path = "";
+      m_PromptSave = false;
+      m_PromptSaveNew = false;
+    }
+  }
+
   bool EditorWidget::OpenFile(const std::string &path) {
     auto doOpen = [&](const std::string &filepath) {
       m_Path = Zep::ZepPath{filepath};
       m_Editor.GetEditor().GetActiveBuffer()->Load(m_Path);
     };
+
+    auto dirty = m_Editor.GetEditor().GetActiveBuffer()->HasFileFlags(Zep::FileFlags::Dirty);
+
+    if (!m_PromptSave) {
+      if (dirty && m_Editor.getText().size() > 0) {
+        if (m_Path.empty()) {
+          m_PromptSave = true;
+          m_PromptSaveNew = false;
+          return false;
+        } else {
+          SaveFile();
+        }
+      }
+    } else {
+      m_PromptSave = false;
+      m_PromptSaveNew = false;
+    }
 
     if (path.size() != 0) {
       doOpen(path);
@@ -140,6 +181,21 @@ namespace dorito {
   }
 
   bool EditorWidget::SaveFile() {
+
+    auto doSave = [&](const char *outPath) {
+      m_Path = Zep::ZepPath{outPath};
+      auto &editor = m_Editor.GetEditor();
+      auto buffer = editor.GetActiveBuffer();
+      auto &fs = editor.GetFileSystem();
+      auto workDir = m_Editor.GetEditor().GetFileSystem().GetWorkingDirectory();
+      int64_t size;
+
+      fs.SetWorkingDirectory(m_Path.parent_path());
+      buffer->SetFilePath(m_Path.filename());
+      buffer->Save(size);
+      fs.SetWorkingDirectory(workDir);
+    };
+
     if (m_Path.empty()) {
       nfdchar_t *outPath = nullptr;
 
@@ -147,13 +203,8 @@ namespace dorito {
 
       switch (result) {
         case NFD_OKAY: {
-          m_Path = Zep::ZepPath{outPath};
-          
-          m_Editor.GetEditor().GetActiveBuffer()->SetFilePath(m_Path);
-          m_Editor.GetEditor().SaveBuffer(*m_Editor.GetEditor().GetActiveBuffer());
-
+          doSave(outPath);
           EventManager::Dispatcher().enqueue<Events::UIAddRecentSourceFile>(m_Path);
-
           delete outPath;
 
           return true;
@@ -168,9 +219,8 @@ namespace dorito {
       }
 
     } else {
-      if (SaveFileText(m_Path.c_str(), (char *) m_Editor.getText().c_str())) {
-        return true;
-      }
+      doSave(m_Path.c_str());
+      return true;
     }
 
     return false;
@@ -202,7 +252,9 @@ namespace dorito {
     }
 
     auto code = m_Editor.getText();
+    m_Editor.GetEditor().GetActiveBuffer()->ClearRangeMarkers(Zep::RangeMarkerType::All);
 
+    spdlog::get("console")->info("{}", code);
     // Freed in octo_free_program
     char *source = (char *) malloc(sizeof(char) * code.size());
 
@@ -214,8 +266,6 @@ namespace dorito {
       auto &editor = m_Editor.GetEditor();
       auto buffer = editor.GetActiveBuffer();
       auto window = editor.GetActiveWindow();
-
-      buffer->ClearRangeMarkers(Zep::RangeMarkerType::All);
 
       auto marker = std::make_shared<Zep::RangeMarker>(*m_Editor.GetEditor().GetActiveBuffer());
 
@@ -242,5 +292,42 @@ namespace dorito {
 
     m_CompiledSuccessfully = true;
     return true;
+  }
+
+  void EditorWidget::ConfirmSave() {
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Save current file?", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+      ImGui::Text("Do you want to save the current file?");
+      ImGui::Separator();
+
+      if (ImGui::Button("Yes", ImVec2(120, 0))) {
+        SaveFile();
+
+        if (!m_PromptSaveNew) {
+          OpenFile();
+        } else {
+          NewFile();
+        }
+
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::SetItemDefaultFocus();
+      ImGui::SameLine();
+
+      if (ImGui::Button("No", ImVec2(120, 0))) {
+        if (!m_PromptSaveNew) {
+          OpenFile();
+        } else {
+          NewFile();
+        }
+
+        ImGui::CloseCurrentPopup();
+      }
+
+      ImGui::EndPopup();
+    }
+
   }
 } // dorito

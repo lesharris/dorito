@@ -140,16 +140,16 @@ namespace dorito {
         m_ColorEditor.Draw();
       }
 
-      if (ShowCodeEditor) {
-        m_Editor.Draw();
-      }
-
       if (ShowSpriteEditor) {
         m_SpriteEditor.Draw();
       }
 
       if (ShowSoundEditor) {
         m_SoundEditor.Draw();
+      }
+
+      if (ShowCodeEditor) {
+        m_Editor.Draw();
       }
 
       m_Viewport.Draw();

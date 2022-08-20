@@ -18,15 +18,21 @@ namespace dorito {
 
     bool SaveFile();
 
+    void NewFile();
+
     bool SaveRom();
 
     bool Compile();
+
+    void ConfirmSave();
 
   private:
     CodeEditor m_Editor{"Code.o8"};
     Zep::ZepPath m_Path;
     octo_program *m_Program = nullptr;
     bool m_CompiledSuccessfully = false;
+    bool m_PromptSave = false;
+    bool m_PromptSaveNew = false;
   };
 
 } // dorito

@@ -25,8 +25,10 @@ namespace dorito {
 
     ZepSyntaxOcto::registerSyntax(m_editor);
 
-    m_editor->InitWithText(name, "\n");
+    m_editor->InitWithText(name, "");
     m_editor->SetGlobalMode(Zep::ZepMode_Standard::StaticName());
+    m_editor->GetActiveBuffer()->Clear();
+    m_editor->GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
   }
 
   void CodeEditor::draw() {
