@@ -23,71 +23,74 @@ namespace dorito {
     auto &cpu = bus.GetCpu();
     auto &ram = bus.GetRam().GetMemory();
 
-    ImGui::Begin("Monitors", &UI::ShowMonitors);
+    if (!ImGui::Begin("Monitors", &UI::ShowMonitors)) {
+      ImGui::End();
+    } else {
 
-    ImGui::BeginTable("monitors", 2, ImGuiTableFlags_RowBg);
-    ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 100.0f);
-    ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-    ImGui::TableHeadersRow();
+      ImGui::BeginTable("monitors", 2, ImGuiTableFlags_RowBg);
+      ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+      ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+      ImGui::TableHeadersRow();
 
-    for (const auto &item: m_Monitors) {
-      ImGui::TableNextRow();
+      for (const auto &item: m_Monitors) {
+        ImGui::TableNextRow();
 
-      switch (item.type) {
-        case Type::Register: {
-          std::string name = fmt::format("v{:X} - v{:X}", item.base, item.length);
-          std::string values;
+        switch (item.type) {
+          case Type::Register: {
+            std::string name = fmt::format("v{:X} - v{:X}", item.base, item.length);
+            std::string values;
 
-          ImGui::TableSetColumnIndex(0);
-          ImGui::Text("%s", name.c_str());
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("%s", name.c_str());
 
-          ImGui::TableSetColumnIndex(1);
+            ImGui::TableSetColumnIndex(1);
 
-          for (auto i = item.base; i <= item.length; i++) {
-            if (i > 0 && i % 4 == 0)
-              values += "\n";
-
-            values += fmt::format("0x{:02X} ", cpu.regs.v[i]);
-          }
-
-          ImGui::Text("%s", values.c_str());
-        }
-          break;
-        case Type::Memory: {
-          std::string name = fmt::format("{}", item.name);
-          std::string values;
-
-          ImGui::TableSetColumnIndex(0);
-          ImGui::Text("%s", name.c_str());
-
-          ImGui::TableSetColumnIndex(1);
-
-          if (item.length == -1 && item.format.size() == 0) {
-            ImGui::Text("<Invalid>");
-            continue;
-          }
-
-          if (item.format.size() == 0) {
-            for (auto i = item.base; i <= item.base + item.length; i++) {
-              if (i > item.base && i % 4 == 0)
+            for (auto i = item.base; i <= item.length; i++) {
+              if (i > 0 && i % 4 == 0)
                 values += "\n";
 
-              values += fmt::format("0x{:02X} ", ram[i]);
+              values += fmt::format("0x{:02X} ", cpu.regs.v[i]);
             }
 
             ImGui::Text("%s", values.c_str());
-          } else {
-            auto parsed = ParseFormat(item);
-            ImGui::Text("%s", parsed.c_str());
           }
+            break;
+          case Type::Memory: {
+            std::string name = fmt::format("{}", item.name);
+            std::string values;
+
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("%s", name.c_str());
+
+            ImGui::TableSetColumnIndex(1);
+
+            if (item.length == -1 && item.format.size() == 0) {
+              ImGui::Text("<Invalid>");
+              continue;
+            }
+
+            if (item.format.size() == 0) {
+              for (auto i = item.base; i <= item.base + item.length; i++) {
+                if (i > item.base && i % 4 == 0)
+                  values += "\n";
+
+                values += fmt::format("0x{:02X} ", ram[i]);
+              }
+
+              ImGui::Text("%s", values.c_str());
+            } else {
+              auto parsed = ParseFormat(item);
+              ImGui::Text("%s", parsed.c_str());
+            }
+          }
+            break;
         }
-          break;
       }
+
+      ImGui::EndTable();
+
+      ImGui::End();
     }
-
-    ImGui::EndTable();
-
-    ImGui::End();
   }
 
   void MonitorsWidget::HandleClearMonitors(const Events::UIClearMonitors &) {
