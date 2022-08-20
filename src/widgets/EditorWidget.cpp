@@ -106,13 +106,7 @@ namespace dorito {
   bool EditorWidget::OpenFile(const std::string &path) {
     auto doOpen = [&](const std::string &filepath) {
       m_Path = Zep::ZepPath{filepath};
-      auto fileText = LoadFileText(filepath.c_str());
-      std::string file{fileText};
-      UnloadFileText(fileText);
-
-      m_Editor.setText(file);
-      m_Editor.GetEditor().GetActiveBuffer()->SetFilePath(m_Path);
-      m_Editor.GetEditor().GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
+      m_Editor.GetEditor().GetActiveBuffer()->Load(m_Path);
     };
 
     if (path.size() != 0) {
@@ -154,11 +148,9 @@ namespace dorito {
       switch (result) {
         case NFD_OKAY: {
           m_Path = Zep::ZepPath{outPath};
-
-          SaveFileText(m_Path.c_str(), (char *) m_Editor.getText().c_str());
-
+          
           m_Editor.GetEditor().GetActiveBuffer()->SetFilePath(m_Path);
-          m_Editor.GetEditor().GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
+          m_Editor.GetEditor().SaveBuffer(*m_Editor.GetEditor().GetActiveBuffer());
 
           EventManager::Dispatcher().enqueue<Events::UIAddRecentSourceFile>(m_Path);
 
@@ -177,7 +169,6 @@ namespace dorito {
 
     } else {
       if (SaveFileText(m_Path.c_str(), (char *) m_Editor.getText().c_str())) {
-        m_Editor.GetEditor().GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
         return true;
       }
     }
@@ -241,7 +232,7 @@ namespace dorito {
 
       auto pos = Zep::GlyphIterator{buffer, (unsigned long) range.first + m_Program->error_pos + 1};
       window->SetBufferCursor(pos);
-      
+
       Zep::GlyphRange glyphRange{buffer, range};
       buffer->BeginFlash(1.0f, Zep::FlashType::Flash, glyphRange);
 
