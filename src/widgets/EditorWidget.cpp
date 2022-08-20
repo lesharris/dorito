@@ -243,6 +243,10 @@ namespace dorito {
   }
 
   bool EditorWidget::Compile() {
+    auto &bus = Bus::Get();
+    auto &cpu = bus.GetCpu();
+
+    cpu.ClearBreakpoints();
     DeleteProgram();
 
     auto code = m_Editor.getText();
@@ -269,6 +273,14 @@ namespace dorito {
                                                                      key
                                                                  });
       }
+    }
+
+    for (uint16_t i = 0; i < 1024 * 64 - 1; i++) {
+      if (!m_Program->breakpoints[i])
+        continue;
+
+      std::string label = m_Program->breakpoints[i];
+      cpu.AddBreakpoint({label, i, true});
     }
 
     if (m_Program->is_error) {

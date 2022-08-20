@@ -23,6 +23,12 @@ namespace dorito {
       IRegCarry
     };
 
+    struct Breakpoint {
+      std::string label;
+      uint16_t addr;
+      bool enabled;
+    };
+
     struct Registers {
       // General purpose registers
       uint8_t v[16];
@@ -48,6 +54,9 @@ namespace dorito {
 
       // Quirks
       bool quirks[8];
+
+      // Breakpoints
+      std::vector<Breakpoint> breakpoints;
     };
 
     struct DisassemblyLine {
@@ -117,6 +126,38 @@ namespace dorito {
 
     void SetHighRes(bool isSet) {
       m_HighRes = isSet;
+    }
+
+    void AddBreakpoint(const Breakpoint &bp) {
+      regs.breakpoints.push_back(bp);
+    }
+
+    void ToggleBreakpoint(const Breakpoint &breakpoint) {
+      for (auto &bp: regs.breakpoints) {
+        if (bp.label == breakpoint.label) {
+          bp.enabled = !bp.enabled;
+          break;
+        }
+      }
+    }
+
+    void RemoveBreakpoint(const Breakpoint &breakpoint) {
+      std::vector<Breakpoint> newBps;
+
+      for (const auto &bp: regs.breakpoints) {
+        if (bp.label != breakpoint.label)
+          newBps.push_back(bp);
+      }
+
+      regs.breakpoints = newBps;
+    }
+
+    void ClearBreakpoints() {
+      regs.breakpoints.clear();
+    }
+
+    [[nodiscard]] const std::vector<Breakpoint> &Breakpoints() const {
+      return regs.breakpoints;
     }
 
     [[nodiscard]] bool Halted() const { return m_Halted; }

@@ -28,6 +28,7 @@
 #include "widgets/SpriteEditorWidget.h"
 #include "widgets/SoundEditorWidget.h"
 #include "widgets/MonitorsWidget.h"
+#include "widgets/BreakpointsWidget.h"
 
 namespace dorito {
 
@@ -59,6 +60,7 @@ namespace dorito {
     static bool ShowSoundEditor;
     static bool ShowSpriteEditor;
     static bool ShowMonitors;
+    static bool ShowBreakpoints;
     static uint16_t PrevPC;
 
   private:
@@ -82,6 +84,7 @@ namespace dorito {
     SpriteEditorWidget m_SpriteEditor;
     SoundEditorWidget m_SoundEditor;
     MonitorsWidget m_Monitors;
+    BreakpointsWidget m_Breakpoints;
   };
 
 } // dorito

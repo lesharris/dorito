@@ -492,6 +492,17 @@ namespace dorito {
     DisassembleNext();
     Fetch();
 
+    auto it = std::find_if(regs.breakpoints.begin(),
+                           regs.breakpoints.end(),
+                           [&](const Breakpoint &breakpoint) {
+                             return breakpoint.enabled && (breakpoint.addr == regs.pc);
+                           });
+
+    if (it != std::end(regs.breakpoints)) {
+      EventManager::Dispatcher().trigger<Events::ExecuteCPU>(Events::ExecuteCPU{false});
+      return;
+    }
+
     // Execute
     if (m_CurrentInstruction) {
       // Lol this syntax is toxic
