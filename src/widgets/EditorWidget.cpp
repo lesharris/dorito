@@ -116,10 +116,7 @@ namespace dorito {
       m_Editor.GetEditor().GetActiveBuffer()->Clear();
       m_Editor.GetEditor().GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
 
-      if (m_Program) {
-        octo_free_program(m_Program);
-        m_Program = nullptr;
-      }
+      DeleteProgram();
 
       m_Path = "";
       m_PromptSave = false;
@@ -246,10 +243,7 @@ namespace dorito {
   }
 
   bool EditorWidget::Compile() {
-    if (m_Program) {
-      octo_free_program(m_Program);
-      m_Program = nullptr;
-    }
+    DeleteProgram();
 
     auto code = m_Editor.getText();
     m_Editor.GetEditor().GetActiveBuffer()->ClearRangeMarkers(Zep::RangeMarkerType::All);
@@ -261,6 +255,21 @@ namespace dorito {
     memcpy(source, code.c_str(), code.size());
 
     m_Program = octo_compile_str(source);
+
+    if (m_Program->monitors.keys.count > 0) {
+      for (auto i = 0; i < m_Program->monitors.keys.count; i++) {
+        auto key = (char *) m_Program->monitors.keys.data[i];
+        auto monitor = (octo_mon *) m_Program->monitors.values.data[i];
+
+        EventManager::Dispatcher().enqueue<Events::UIAddMonitor>({
+                                                                     monitor->type,
+                                                                     monitor->base,
+                                                                     monitor->len,
+                                                                     monitor->format,
+                                                                     key
+                                                                 });
+      }
+    }
 
     if (m_Program->is_error) {
       auto &editor = m_Editor.GetEditor();
@@ -329,5 +338,13 @@ namespace dorito {
       ImGui::EndPopup();
     }
 
+  }
+
+  void EditorWidget::DeleteProgram() {
+    if (m_Program) {
+      EventManager::Dispatcher().trigger<Events::UIClearMonitors>();
+      octo_free_program(m_Program);
+      m_Program = nullptr;
+    }
   }
 } // dorito

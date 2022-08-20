@@ -256,6 +256,8 @@ namespace dorito {
 
     friend class DisassemblyWidget;
 
+    friend class MonitorsWidget;
+
     friend class AudioWidget;
 
     friend class Bus;

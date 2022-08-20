@@ -60,6 +60,7 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(unofficial-nativefiledialog CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(scn CONFIG REQUIRED)
 
 # Dorito 🎉
 add_executable(${PROJECT_NAME}
@@ -129,7 +130,9 @@ add_executable(${PROJECT_NAME}
     src/widgets/SoundEditorWidget.cpp
     src/widgets/SoundEditorWidget.h
     src/widgets/SpriteEditorWidget.cpp
-    src/widgets/SpriteEditorWidget.h)
+    src/widgets/SpriteEditorWidget.h
+    src/widgets/MonitorsWidget.cpp
+    src/widgets/MonitorsWidget.h)
 
 # Compile Options
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
@@ -163,7 +166,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     EnTT::EnTT
     unofficial::nativefiledialog::nfd
     nlohmann_json::nlohmann_json
-    Zep::Zep)
+    Zep::Zep
+    scn::scn)
 
 if (APPLE)
   target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit")

@@ -156,6 +156,10 @@ void octo_free_program(octo_program *p);
 
 octo_program *octo_compile_str(char *text);
 
+void *octo_map_get(octo_map *map, char *key);
+
+void *octo_map_set(octo_map *map, char *key, void *value);
+
 #ifdef __cplusplus
 }
 #endif

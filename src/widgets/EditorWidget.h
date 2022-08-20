@@ -26,6 +26,8 @@ namespace dorito {
 
     void ConfirmSave();
 
+    void DeleteProgram();
+
   private:
     CodeEditor m_Editor{"Code.o8"};
     Zep::ZepPath m_Path;

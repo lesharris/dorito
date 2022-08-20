@@ -18,6 +18,7 @@ namespace dorito {
   bool UI::ShowCodeEditor = true;
   bool UI::ShowSoundEditor = true;
   bool UI::ShowSpriteEditor = true;
+  bool UI::ShowMonitors = true;
 
   uint16_t UI::PrevPC = 0;
 
@@ -146,6 +147,10 @@ namespace dorito {
 
       if (ShowSoundEditor) {
         m_SoundEditor.Draw();
+      }
+
+      if (ShowMonitors) {
+        m_Monitors.Draw();
       }
 
       if (ShowCodeEditor) {

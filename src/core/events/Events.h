@@ -236,4 +236,19 @@ namespace dorito::Events {
 
     std::string path;
   };
+
+  struct UIClearMonitors : public Event {
+    UIClearMonitors() : Event() {}
+  };
+
+  struct UIAddMonitor : public Event {
+    UIAddMonitor(int32_t type, int32_t base, int32_t len, char *format, char *name)
+        : Event(), type(type), base(base), len(len), format(format), name(name) {}
+
+    int32_t type;
+    int32_t base;
+    int32_t len;
+    char *format;
+    char *name;
+  };
 }
