@@ -141,6 +141,9 @@ namespace dorito {
       }
 
       if (colorSprite) {
+        ImGui::Separator();
+        ImGui::Dummy({0, 5.0f});
+        
         float sz = ImGui::GetTextLineHeight();
 
         sz += 10.0f;

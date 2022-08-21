@@ -95,12 +95,6 @@ namespace dorito {
 
       ConfirmSave();
 
-      if (m_Program && m_CompiledSuccessfully) {
-        static MemoryEditor compiledRom;
-
-        compiledRom.DrawWindow("Compiled Rom", m_Program->rom, 1024 * 64);
-      }
-
       ImGui::End();
     }
   }
