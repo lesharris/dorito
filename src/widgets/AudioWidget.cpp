@@ -8,7 +8,7 @@ namespace dorito {
     auto &cpu = bus.GetCpu();
     auto &buffer = bus.GetRam().GetAudioBuffer();
 
-    if (!ImGui::Begin("Audio", &UI::ShowAudio)) {
+    if (!ImGui::Begin(ICON_FA_HEADPHONES " Audio", &UI::ShowAudio)) {
       ImGui::End();
     } else {
       ImGui::BeginTable("pitch", 1, ImGuiTableFlags_RowBg);

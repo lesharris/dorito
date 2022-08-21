@@ -8,7 +8,7 @@ namespace dorito {
     auto &cpu = bus.GetCpu();
     auto &breakpoints = cpu.Breakpoints();
 
-    if (!ImGui::Begin("Breakpoints", &UI::ShowBreakpoints)) {
+    if (!ImGui::Begin(ICON_FA_CIRCLE " Breakpoints", &UI::ShowBreakpoints)) {
       ImGui::End();
     } else {
       ImGui::BeginTable("breakpoints", 4, ImGuiTableFlags_RowBg);

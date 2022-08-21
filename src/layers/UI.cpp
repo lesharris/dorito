@@ -6,6 +6,8 @@
 
 #include "system/Bus.h"
 
+#include "external/IconsFontAwesome5.h"
+
 namespace dorito {
 
   bool UI::ShowDemo = false;
@@ -39,6 +41,13 @@ namespace dorito {
     // Render fonts at half scale for sharper fonts.
     auto dpi = GetWindowScaleDPI();
     io.Fonts->AddFontFromFileTTF("assets/fonts/CascadiaMono.ttf", 16.0f * dpi.y);
+
+    static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
+    ImFontConfig icons_config;
+    icons_config.MergeMode = true;
+    icons_config.PixelSnapH = true;
+    io.Fonts->AddFontFromFileTTF("assets/fonts/fa-solid-900.ttf", 16.0f * dpi.y, &icons_config, icons_ranges);
+
     io.FontGlobalScale = 1.0f / dpi.y;
 
     auto glfwWindow = glfwGetCurrentContext();

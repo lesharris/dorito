@@ -34,7 +34,7 @@ namespace dorito {
     ImVec4 fc2Color = colorToImvec(palette[2]);
     ImVec4 blColor = colorToImvec(palette[3]);
 
-    if (!ImGui::Begin("Edit Colors", &UI::ShowColorEditor)) {
+    if (!ImGui::Begin(ICON_FA_PALETTE " Edit Colors", &UI::ShowColorEditor)) {
       ImGui::End();
     } else {
 

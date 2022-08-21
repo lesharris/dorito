@@ -8,6 +8,6 @@ namespace dorito {
 
     static MemoryEditor memoryViewer;
 
-    memoryViewer.DrawWindow("Memory", &bus.GetRam().GetMemory()[0], 1024 * 64);
+    memoryViewer.DrawWindow(ICON_FA_MEMORY " Memory", &bus.GetRam().GetMemory()[0], 1024 * 64);
   }
 } // dorito

@@ -10,96 +10,99 @@ namespace dorito {
     auto &bus = Bus::Get();
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    if (!ImGui::Begin(ICON_FA_CODE " Code", &UI::ShowCodeEditor, ImGuiWindowFlags_MenuBar)) {
+      ImGui::PopStyleVar();
+      ImGui::End();
+    } else {
 
-    ImGui::Begin("Code", &UI::ShowCodeEditor, ImGuiWindowFlags_MenuBar);
-
-    ImGui::PopStyleVar();
-    if (ImGui::BeginMenuBar()) {
-      if (ImGui::BeginMenu("File")) {
-        if (ImGui::MenuItem("New", nullptr)) {
-          NewFile();
-        }
-
-        ImGui::Separator();
-
-        if (ImGui::MenuItem("Open...", nullptr)) {
-          OpenFile();
-        }
-
-        auto &paths = bus.RecentSourceFiles();
-
-        if (ImGui::BeginMenu("Open Recent...", paths.size() != 0)) {
-
-          for (const auto &path: paths) {
-            auto zpath = Zep::ZepPath{path};
-            auto filepath = fmt::format("{}{}", zpath.stem().c_str(), zpath.extension().c_str());
-
-            if (ImGui::MenuItem(filepath.c_str(), nullptr)) {
-              OpenFile(path);
-            }
+      ImGui::PopStyleVar();
+      if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+          if (ImGui::MenuItem(ICON_FA_FILE " New", nullptr)) {
+            NewFile();
           }
 
           ImGui::Separator();
 
-          if (ImGui::MenuItem("Clear Recents", nullptr)) {
-            EventManager::Dispatcher().enqueue<Events::UIClearRecentSources>();
+          if (ImGui::MenuItem("Open...", nullptr)) {
+            OpenFile();
+          }
+
+          auto &paths = bus.RecentSourceFiles();
+
+          if (ImGui::BeginMenu("Open Recent...", paths.size() != 0)) {
+
+            for (const auto &path: paths) {
+              auto zpath = Zep::ZepPath{path};
+              auto filepath = fmt::format("{}{}", zpath.stem().c_str(), zpath.extension().c_str());
+
+              if (ImGui::MenuItem(filepath.c_str(), nullptr)) {
+                OpenFile(path);
+              }
+            }
+
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Clear Recents", nullptr)) {
+              EventManager::Dispatcher().enqueue<Events::UIClearRecentSources>();
+            }
+
+            ImGui::EndMenu();
+          }
+
+          ImGui::Separator();
+
+          if (ImGui::MenuItem(ICON_FA_SAVE " Save", nullptr)) {
+            SaveFile();
           }
 
           ImGui::EndMenu();
         }
 
-        ImGui::Separator();
-
-        if (ImGui::MenuItem("Save", nullptr)) {
-          SaveFile();
-        }
-
-        ImGui::EndMenu();
-      }
-
-      if (ImGui::BeginMenu("Code")) {
-        if (ImGui::MenuItem("Run", nullptr)) {
-          if (SaveFile()) {
-            if (Compile()) {
-              SaveRom();
-              auto viewport = ImGui::FindWindowByName("Viewport");
-              ImGui::FocusWindow(viewport);
-              EventManager::Dispatcher().enqueue<Events::RunCode>(m_Program->rom);
+        if (ImGui::BeginMenu("Code")) {
+          if (ImGui::MenuItem(ICON_FA_PLAY " Run", nullptr)) {
+            if (SaveFile()) {
+              if (Compile()) {
+                SaveRom();
+                auto viewport = ImGui::FindWindowByName("Viewport");
+                ImGui::FocusWindow(viewport);
+                EventManager::Dispatcher().enqueue<Events::RunCode>(m_Program->rom);
+              }
             }
           }
-        }
 
-        ImGui::Separator();
+          ImGui::Separator();
 
-        if (ImGui::MenuItem("Compile", nullptr)) {
-          if (SaveFile()) {
-            if (Compile()) {
-              SaveRom();
+          if (ImGui::MenuItem(ICON_FA_COG " Compile", nullptr)) {
+            if (SaveFile()) {
+              if (Compile()) {
+                SaveRom();
+              }
             }
           }
+
+          ImGui::EndMenu();
         }
 
-        ImGui::EndMenu();
+        ImGui::EndMenuBar();
       }
 
-      ImGui::EndMenuBar();
+      m_Editor.draw();
+
+      if (m_PromptSave) {
+        ImGui::OpenPopup("Save current file?");
+      }
+
+      ConfirmSave();
+
+      if (m_Program && m_CompiledSuccessfully) {
+        static MemoryEditor compiledRom;
+
+        compiledRom.DrawWindow("Compiled Rom", m_Program->rom, 1024 * 64);
+      }
+
+      ImGui::End();
     }
-
-    m_Editor.draw();
-
-    if (m_PromptSave) {
-      ImGui::OpenPopup("Save current file?");
-    }
-
-    ConfirmSave();
-
-    if (m_Program && m_CompiledSuccessfully) {
-      static MemoryEditor compiledRom;
-
-      compiledRom.DrawWindow("Compiled Rom", m_Program->rom, 1024 * 64);
-    }
-
-    ImGui::End();
   }
 
   void EditorWidget::NewFile() {

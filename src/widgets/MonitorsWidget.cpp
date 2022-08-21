@@ -23,7 +23,7 @@ namespace dorito {
     auto &cpu = bus.GetCpu();
     auto &ram = bus.GetRam().GetMemory();
 
-    if (!ImGui::Begin("Monitors", &UI::ShowMonitors)) {
+    if (!ImGui::Begin(ICON_FA_SEARCH " Monitors", &UI::ShowMonitors)) {
       ImGui::End();
     } else {
 

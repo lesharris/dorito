@@ -7,7 +7,7 @@ namespace dorito {
     auto &bus = Bus::Get();
     auto &cpu = bus.GetCpu();
 
-    if (!ImGui::Begin("Registers", &UI::ShowRegisters)) {
+    if (!ImGui::Begin(ICON_FA_MICROCHIP " Registers", &UI::ShowRegisters)) {
       ImGui::End();
     } else {
 
@@ -18,14 +18,14 @@ namespace dorito {
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
 
-      if (ImGui::Button(bus.Running() ? "Pause" : "Run")) {
+      if (ImGui::Button(bus.Running() ? ICON_FA_PAUSE " Pause" : ICON_FA_PLAY " Run")) {
         EventManager::Dispatcher().enqueue<Events::ExecuteCPU>({!bus.Running()});
       }
 
       ImGui::SameLine();
 
       if (!bus.Running()) {
-        if (ImGui::Button("Step")) {
+        if (ImGui::Button(ICON_FA_STEP_FORWARD " Step")) {
           EventManager::Dispatcher().enqueue<Events::StepCPU>({});
         }
       }

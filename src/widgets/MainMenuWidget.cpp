@@ -107,7 +107,7 @@ namespace dorito {
         }
 
         ImGui::Separator();
-        if (ImGui::MenuItem("Quit", nullptr)) {
+        if (ImGui::MenuItem(ICON_FA_SIGN_OUT_ALT " Quit", nullptr)) {
           EventManager::Dispatcher().trigger<Events::WantQuit>();
         }
 
@@ -115,13 +115,13 @@ namespace dorito {
       }
 
       if (ImGui::BeginMenu("Edit")) {
-        if (ImGui::MenuItem("Mute Dorito", nullptr, &m_DoritoMuted)) {
+        if (ImGui::MenuItem(ICON_FA_VOLUME_MUTE " Mute Dorito", nullptr, &m_DoritoMuted)) {
           EventManager::Dispatcher().enqueue(Events::SetMute(m_DoritoMuted));
         }
 
         ImGui::Separator();
 
-        if (ImGui::BeginMenu("Speed")) {
+        if (ImGui::BeginMenu(ICON_FA_TACHOMETER_ALT " Speed")) {
           for (auto &entry: m_CycleEntries) {
             if (entry.cycles == 0) {
               ImGui::Separator();
@@ -136,7 +136,7 @@ namespace dorito {
           ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Compatibility")) {
+        if (ImGui::BeginMenu(ICON_FA_LIST " Compatibility")) {
           for (auto &entry: m_ProfileEntries) {
             if (ImGui::MenuItem(entry.label.c_str(), nullptr, &(entry.set))) {
 
@@ -193,7 +193,7 @@ namespace dorito {
 
         auto &currentPalette = bus.GetDisplay().Palette();
 
-        if (ImGui::BeginMenu("Colors")) {
+        if (ImGui::BeginMenu(ICON_FA_PALETTE " Colors")) {
           uint8_t index = 0;
 
           for (const auto &entry: m_PaletteEntries) {
@@ -220,21 +220,21 @@ namespace dorito {
       }
 
       if (ImGui::BeginMenu("Development")) {
-        ImGui::MenuItem("Code Editor", nullptr, &UI::ShowCodeEditor);
+        ImGui::MenuItem(ICON_FA_CODE " Code Editor", nullptr, &UI::ShowCodeEditor);
         ImGui::Separator();
-        ImGui::MenuItem("Sprite Editor", nullptr, &UI::ShowSpriteEditor);
-        ImGui::MenuItem("Sound Editor", nullptr, &UI::ShowSoundEditor);
+        ImGui::MenuItem(ICON_FA_PAINT_BRUSH " Sprite Editor", nullptr, &UI::ShowSpriteEditor);
+        ImGui::MenuItem(ICON_FA_MUSIC " Sound Editor", nullptr, &UI::ShowSoundEditor);
         ImGui::EndMenu();
       }
 
       if (ImGui::BeginMenu("Tools")) {
         if (ImGui::BeginMenu("CPU")) {
-          ImGui::MenuItem("Registers", nullptr, &UI::ShowRegisters);
-          ImGui::MenuItem("Disassembly", nullptr, &UI::ShowDisassembly);
+          ImGui::MenuItem(ICON_FA_MICROCHIP " Registers", nullptr, &UI::ShowRegisters);
+          ImGui::MenuItem(ICON_FA_BARS " Disassembly", nullptr, &UI::ShowDisassembly);
           ImGui::EndMenu();
         }
-        ImGui::MenuItem("Memory Viewer", nullptr, &UI::ShowMemory);
-        ImGui::MenuItem("Audio Viewer", nullptr, &UI::ShowAudio);
+        ImGui::MenuItem(ICON_FA_MEMORY " Memory Viewer", nullptr, &UI::ShowMemory);
+        ImGui::MenuItem(ICON_FA_HEADPHONES " Audio Viewer", nullptr, &UI::ShowAudio);
         ImGui::Separator();
         ImGui::MenuItem("ImGui Demo", nullptr, &UI::ShowDemo);
         ImGui::EndMenu();

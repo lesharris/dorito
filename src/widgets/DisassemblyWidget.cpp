@@ -7,7 +7,7 @@ namespace dorito {
     auto &bus = Bus::Get();
     auto &cpu = bus.GetCpu();
 
-    if (!ImGui::Begin("Disassembly", &UI::ShowDisassembly)) {
+    if (!ImGui::Begin(ICON_FA_BARS " Disassembly", &UI::ShowDisassembly)) {
       ImGui::End();
     } else {
 

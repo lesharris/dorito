@@ -4,7 +4,10 @@
 
 namespace dorito {
   void SoundEditorWidget::Draw() {
-    ImGui::Begin("Sound Editor", &UI::ShowSoundEditor);
-    ImGui::End();
+    if (!ImGui::Begin(ICON_FA_MUSIC " Sound Editor", &UI::ShowSoundEditor)) {
+      ImGui::End();
+    } else {
+      ImGui::End();
+    }
   }
 } // dorito

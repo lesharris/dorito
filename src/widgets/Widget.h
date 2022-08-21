@@ -10,6 +10,7 @@
 
 #include "system/Bus.h"
 #include "external/octo_compiler.h"
+#include "external/IconsFontAwesome5.h"
 
 namespace dorito {
   class Widget {
