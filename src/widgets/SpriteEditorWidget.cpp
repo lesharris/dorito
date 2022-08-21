@@ -322,9 +322,9 @@ namespace dorito {
 
       for (auto i = 0; i < 4; i++) {
         uint8_t bit = (3 - i);
-        uint8_t byte = data[index++];
+        uint8_t pixel = data[index++];
 
-        nibble |= (byte << bit);
+        nibble |= (pixel << bit);
 
       }
       return nibble;
@@ -349,7 +349,6 @@ namespace dorito {
 
       } while (count < (hiresSprite ? 32 : 16));
     }
-
 
     if (ImGui::Button(ICON_FA_COPY " Copy", {100, 30})) {
       ImGui::SetClipboardText(output.c_str());

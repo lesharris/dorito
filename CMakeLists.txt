@@ -132,7 +132,11 @@ add_executable(${PROJECT_NAME}
     src/widgets/SpriteEditorWidget.cpp
     src/widgets/SpriteEditorWidget.h
     src/widgets/MonitorsWidget.cpp
-    src/widgets/MonitorsWidget.h src/widgets/BreakpointsWidget.cpp src/widgets/BreakpointsWidget.h src/external/IconsFontAwesome5.h)
+    src/widgets/MonitorsWidget.h
+    src/widgets/BreakpointsWidget.cpp
+    src/widgets/BreakpointsWidget.h
+    src/external/IconsFontAwesome5.h
+    src/external/imgui-knobs.cpp)
 
 # Compile Options
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
