@@ -138,7 +138,7 @@ namespace dorito {
     vsnprintf(buffer, 4096, text, args);
     buffer[4095] = '\0';
 
-    auto log = spdlog::get("raylib");
+    auto log = spdlog::get("console");
 
     switch (logLevel) {
       case LOG_TRACE:

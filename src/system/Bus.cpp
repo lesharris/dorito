@@ -1,6 +1,14 @@
 #include <spdlog/spdlog.h>
 #include "Bus.h"
 
+#include "config.h"
+
+#ifdef APPLE
+
+  #include "external/mac/FolderManager.h"
+
+#endif
+
 namespace dorito {
   Bus::Bus() {
     EventManager::Get().Attach<
@@ -687,13 +695,49 @@ namespace dorito {
 
     json prefs = m_Prefs;
 
-    if (!SaveFileText("dorito.prefs", (char *) to_string(prefs).c_str())) {
+#ifdef APPLE
+    fm::FolderManager folderManager;
+
+    std::string prefsFile = (char *) folderManager.pathForDirectory(fm::NSApplicationSupportDirectory,
+                                                                    fm::NSUserDirectory);
+    prefsFile += "/Dorito";
+
+    if (!DirectoryExists(prefsFile.c_str())) {
+      std::filesystem::create_directory(prefsFile);
+    }
+
+    prefsFile += "/dorito.prefs";
+#endif
+
+#ifdef WINDOWS
+    std::string prefsFile = "dorito.prefs";
+#endif
+
+    if (!SaveFileText(prefsFile.c_str(), (char *) to_string(prefs).c_str())) {
       spdlog::get("console")->warn("Could not save preferences!");
     }
   }
 
   void Bus::LoadPrefs() {
-    auto prefs = LoadFileText("dorito.prefs");
+#ifdef APPLE
+    fm::FolderManager folderManager;
+
+    std::string prefsFile = (char *) folderManager.pathForDirectory(fm::NSApplicationSupportDirectory,
+                                                                    fm::NSUserDirectory);
+    prefsFile += "/Dorito";
+
+    if (!DirectoryExists(prefsFile.c_str())) {
+      std::filesystem::create_directory(prefsFile);
+    }
+
+    prefsFile += "/dorito.prefs";
+#endif
+
+#ifdef WINDOWS
+    std::string prefsFile = "dorito.prefs";
+#endif
+
+    auto prefs = LoadFileText(prefsFile.c_str());
 
     if (prefs) {
       m_Prefs = nlohmann::json::parse(prefs);

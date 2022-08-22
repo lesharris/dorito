@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include "UI.h"
 #include "imgui_internal.h"
 
@@ -7,6 +9,12 @@
 #include "system/Bus.h"
 
 #include "external/IconsFontAwesome5.h"
+
+#ifdef APPLE
+
+  #include "external/mac/FolderManager.h"
+
+#endif
 
 namespace dorito {
 
@@ -25,6 +33,11 @@ namespace dorito {
 
   uint16_t UI::PrevPC = 0;
 
+#ifdef APPLE
+  std::string iniFile;
+#endif
+
+
   void UI::OnAttach() {
     ImGui::CreateContext(nullptr);
 
@@ -38,15 +51,39 @@ namespace dorito {
 
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
+#ifdef APPLE
+    fm::FolderManager folderManager;
+
+    std::string monoFont = folderManager.pathForResource("CascadiaMono.ttf");
+    std::string iconFont = folderManager.pathForResource("fa-solid-900.ttf");
+
+    iniFile = (char *) folderManager.pathForDirectory(fm::NSApplicationSupportDirectory,
+                                                      fm::NSUserDirectory);
+    iniFile += "/Dorito";
+
+    if (!DirectoryExists(iniFile.c_str())) {
+      std::filesystem::create_directory(iniFile);
+    }
+
+    iniFile += "/imgui.ini";
+
+    io.IniFilename = iniFile.c_str();
+#endif
+
+#ifdef WINDOWS
+    std::string monoFont = "assets/fonts/CascadiaMono.ttf";
+    std::string iconFont = "assets/fonts/fa-solid-900.ttf";
+#endif
+
     // Render fonts at half scale for sharper fonts.
     auto dpi = GetWindowScaleDPI();
-    io.Fonts->AddFontFromFileTTF("assets/fonts/CascadiaMono.ttf", 16.0f * dpi.y);
+    io.Fonts->AddFontFromFileTTF(monoFont.c_str(), 16.0f * dpi.y);
 
     static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
     ImFontConfig icons_config;
     icons_config.MergeMode = true;
     icons_config.PixelSnapH = true;
-    io.Fonts->AddFontFromFileTTF("assets/fonts/fa-solid-900.ttf", 16.0f * dpi.y, &icons_config, icons_ranges);
+    io.Fonts->AddFontFromFileTTF(iconFont.c_str(), 16.0f * dpi.y, &icons_config, icons_ranges);
 
     io.FontGlobalScale = 1.0f / dpi.y;
 

@@ -1,13 +1,26 @@
 #pragma once
 
+#include "config.h"
+
 #include "raylib.h"
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 #include "common/common.h"
 #include "core/layers/GameLayerStack.h"
 #include "core/events/EventManager.h"
+
+#include <iostream>
+#include <filesystem>
+
+
+#ifdef APPLE
+
+  #include "external/mac/FolderManager.h"
+
+#endif
 
 namespace dorito {
 
@@ -39,9 +52,39 @@ namespace dorito {
 
   private:
     Dorito() {
-      m_ConsoleSink = spdlog::stdout_color_mt("console");
-      m_RaylibSink = spdlog::stdout_color_mt("raylib");
 
+#ifdef APPLE
+      fm::FolderManager folderManager;
+
+      std::string logPath = (char *) folderManager.pathForDirectory(fm::NSApplicationSupportDirectory,
+                                                                    fm::NSUserDirectory);
+      logPath += "/Dorito";
+
+      if (!DirectoryExists(logPath.c_str())) {
+        std::filesystem::create_directory(logPath);
+      }
+
+      logPath += "/dorito.log";
+
+      std::string appPath = (char *) folderManager.pathForDirectory(fm::NSApplicationDirectory,
+                                                                    fm::NSAllDomainsMask);
+      std::cout << appPath << std::endl;
+
+      std::cout << GetApplicationDirectory() << std::endl;
+#endif
+
+#ifdef WINDOWS
+      std::string logPath = "dorito.log";
+#endif
+
+      auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+      auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath, true);
+
+      m_ConsoleLogger = std::make_shared<spdlog::logger>("console", spdlog::sinks_init_list{consoleSink, fileSink});
+
+      spdlog::register_logger(m_ConsoleLogger);
+
+      m_ConsoleLogger->info("APP DIR: {}", GetApplicationDirectory());
       Initialize();
     };
 
@@ -64,8 +107,7 @@ namespace dorito {
   private:
     GameLayerStack *m_GameLayers = nullptr;
 
-    Ref<spdlog::logger> m_ConsoleSink;
-    Ref<spdlog::logger> m_RaylibSink;
+    Ref<spdlog::logger> m_ConsoleLogger;
 
     std::string m_Title;
 
