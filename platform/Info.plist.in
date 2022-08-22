@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Dorito</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Dorito - An IDE for Chip8, SCHIP, and XOChip.</string>
+	<string>Dorito v@PROJECT_VERSION@ - An IDE for Chip8, SCHIP, and XOChip.</string>
 	<key>CFBundleIconFile</key>
 	<string>dorito.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -15,13 +15,13 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleLongVersionString</key>
-	<string>Dorito v0.5</string>
+	<string>Dorito v@PROJECT_VERSION@</string>
 	<key>CFBundleName</key>
 	<string>Dorito</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.5.0</string>
+	<string>@PROJECT_VERSION@</string>
 	<key>CFBundleSignature</key>
 	<string>com.lesharris.dorito</string>
 	<key>CFBundleVersion</key>

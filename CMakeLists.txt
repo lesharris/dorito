@@ -18,7 +18,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 include(${CMAKE_SOURCE_DIR}/cmake/AddIconToBinary.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/AddFonts.cmake)
-include(${CMAKE_SOURCE_DIR}/cmake/AddPlist.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/AddPNG.cmake)
 
 # Dependencies
@@ -158,10 +157,15 @@ if (MSVC)
 elseif (APPLE)
   AddFont(SOURCE_FILES FONT ${CMAKE_SOURCE_DIR}/assets/fonts/CascadiaMono.ttf)
   AddFont(SOURCE_FILES FONT ${CMAKE_SOURCE_DIR}/assets/fonts/fa-solid-900.ttf)
-  AddPlist(SOURCE_FILES PLIST ${CMAKE_SOURCE_DIR}/platform/Info.plist)
   AddPNG(SOURCE_FILES PNG ${CMAKE_SOURCE_DIR}/assets/dorito.png)
 
   add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCE_FILES})
+
+  set_target_properties(${PROJECT_NAME} PROPERTIES
+      MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/platform/Info.plist.in"
+      )
+  #AddPlist(SOURCE_FILES PLIST ${CMAKE_SOURCE_DIR}/platform/Info.plist)
+
 else ()
   # To do - Add a desktop file for an icon and install stuff?
   add_executable(${PROJECT_NAME} ${SOURCE_FILES})
