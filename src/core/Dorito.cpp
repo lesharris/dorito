@@ -1,4 +1,3 @@
-
 #include "config.h"
 #include "input/Input.h"
 #include "events/EventManager.h"
@@ -100,6 +99,8 @@ namespace dorito {
 
     InitAudioDevice();
 
+    m_Logo = LoadTexture(m_LogoPath.c_str());
+
     EventManager::Get().Attach<
         Events::ViewportResized,
         &Dorito::HandleViewportResized
@@ -126,6 +127,7 @@ namespace dorito {
 
     delete m_GameLayers;
 
+    UnloadTexture(m_Logo);
     UnloadRenderTexture(m_RenderTexture);
 
     CloseAudioDevice();

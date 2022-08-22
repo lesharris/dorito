@@ -42,6 +42,8 @@ namespace dorito {
 
     RenderTexture &GetRenderTexture() { return m_RenderTexture; }
 
+    Texture &GetLogoTexture() { return m_Logo; }
+
     int32_t ScreenWidth() {
       return m_ScreenWidth;
     }
@@ -66,15 +68,12 @@ namespace dorito {
 
       logPath += "/dorito.log";
 
-      std::string appPath = (char *) folderManager.pathForDirectory(fm::NSApplicationDirectory,
-                                                                    fm::NSAllDomainsMask);
-      std::cout << appPath << std::endl;
-
-      std::cout << GetApplicationDirectory() << std::endl;
+      m_LogoPath = folderManager.pathForResource("dorito.png");
 #endif
 
 #ifdef WINDOWS
       std::string logPath = "dorito.log";
+      m_LogoPath = "assets/dorito.png";
 #endif
 
       auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -84,7 +83,6 @@ namespace dorito {
 
       spdlog::register_logger(m_ConsoleLogger);
 
-      m_ConsoleLogger->info("APP DIR: {}", GetApplicationDirectory());
       Initialize();
     };
 
@@ -129,6 +127,9 @@ namespace dorito {
 
     Camera2D m_Camera{};
     RenderTexture m_RenderTexture;
+
+    Texture m_Logo;
+    std::string m_LogoPath;
 
     class System *m_System = nullptr;
   };

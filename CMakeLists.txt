@@ -19,6 +19,7 @@ set(CMAKE_CXX_STANDARD 20)
 include(${CMAKE_SOURCE_DIR}/cmake/AddIconToBinary.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/AddFonts.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/AddPlist.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/AddPNG.cmake)
 
 # Dependencies
 
@@ -158,6 +159,7 @@ elseif (APPLE)
   AddFont(SOURCE_FILES FONT ${CMAKE_SOURCE_DIR}/assets/fonts/CascadiaMono.ttf)
   AddFont(SOURCE_FILES FONT ${CMAKE_SOURCE_DIR}/assets/fonts/fa-solid-900.ttf)
   AddPlist(SOURCE_FILES PLIST ${CMAKE_SOURCE_DIR}/platform/Info.plist)
+  AddPNG(SOURCE_FILES PNG ${CMAKE_SOURCE_DIR}/assets/dorito.png)
 
   add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCE_FILES})
 else ()

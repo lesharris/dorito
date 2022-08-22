@@ -239,7 +239,61 @@ namespace dorito {
         ImGui::MenuItem("ImGui Demo", nullptr, &UI::ShowDemo);
         ImGui::EndMenu();
       }
+
+      if (ImGui::BeginMenu("Help")) {
+        if (ImGui::MenuItem(ICON_FA_BOLT " About...", nullptr)) {
+          m_About = true;
+        }
+        ImGui::EndMenu();
+      }
       ImGui::EndMenuBar();
+    }
+
+    if (m_About) {
+      ImGui::OpenPopup("About Dorito...");
+      ImGui::SetNextWindowSize({370.0f, 350.0f}, ImGuiCond_Appearing);
+    }
+
+    std::string name = fmt::format(ICON_FA_MICROCHIP " Dorito v{}", DORITO_VERSION);
+    std::string repo = fmt::format("https://github.com/lesharris/dorito");
+
+    if (ImGui::BeginPopupModal("About Dorito...", NULL, ImGuiWindowFlags_NoResize)) {
+
+      auto &app = Dorito::Get();
+      auto &logo = app.GetLogoTexture();
+
+      auto region = ImGui::GetContentRegionAvail();
+      auto textSize = ImGui::CalcTextSize(name.c_str());
+      auto repoSize = ImGui::CalcTextSize(repo.c_str());
+
+      ImGui::SetCursorPosX((region.x - (logo.width * 0.5f)) * 0.5);
+
+      ImGui::Image(reinterpret_cast<ImTextureID>((uint64_t) logo.id),
+                   {static_cast<float>(logo.width) * 0.5f, static_cast<float>(logo.height) * 0.5f},
+                   {0, 0}, {1, 1});
+
+
+      ImGui::Dummy({0.0f, 30.0f});
+      ImGui::SetCursorPosX((region.x - textSize.x) * 0.5);
+      ImGui::Text("%s", name.c_str());
+      ImGui::Dummy({0.0f, 10.0f});
+      ImGui::SetCursorPosX((region.x - repoSize.x) * 0.5);
+      ImGui::Text("%s", repo.c_str());
+      ImGui::Dummy({0.0f, 10.0f});
+      ImGui::Separator();
+      ImGui::Dummy({0.0f, 10.0f});
+
+      ImGui::SetCursorPosX((region.x - 120.0f) * 0.5);
+
+      ImGui::SetItemDefaultFocus();
+      if (ImGui::Button(ICON_FA_THUMBS_UP " Sweet!", ImVec2(120.0f, 0))) {
+        ImGui::CloseCurrentPopup();
+        m_About = false;
+      }
+
+      ImGui::Dummy({0.0f, 10.0f});
+
+      ImGui::EndPopup();
     }
   }
 

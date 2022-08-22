@@ -247,6 +247,8 @@ namespace dorito {
             true
         }
     };
+
+    bool m_About = false;
   };
 
 } // dorito
