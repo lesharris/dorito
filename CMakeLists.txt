@@ -16,6 +16,9 @@ project(
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 set(CMAKE_CXX_STANDARD 20)
 
+include(${CMAKE_SOURCE_DIR}/cmake/AddIconToBinary.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/AddFonts.cmake)
+
 # Dependencies
 
 # Fetch deps
@@ -62,8 +65,8 @@ find_package(unofficial-nativefiledialog CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(scn CONFIG REQUIRED)
 
-# Dorito 🎉
-add_executable(${PROJECT_NAME}
+# Source Files
+set(SOURCE_FILES
     src/main.cpp
     src/core/Dorito.cpp
     src/core/Dorito.h
@@ -137,6 +140,21 @@ add_executable(${PROJECT_NAME}
     src/widgets/BreakpointsWidget.h
     src/external/IconsFontAwesome5.h
     src/external/imgui-knobs.cpp)
+
+# App Icon
+AddIconToBinary(SOURCE_FILES ICONS ${CMAKE_SOURCE_DIR}/icons/dorito.ico ${CMAKE_SOURCE_DIR}/icons/dorito.icns)
+
+# Dorito 🎉
+if (MSVC)
+  add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})
+elseif (APPLE)
+  AddFont(SOURCE_FILES FONT ${CMAKE_SOURCE_DIR}/assets/fonts/CascadiaMono.ttf)
+  AddFont(SOURCE_FILES FONT ${CMAKE_SOURCE_DIR}/assets/fonts/fa-solid-900.ttf)
+  add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCE_FILES})
+else ()
+  # To do - Add a desktop file for an icon and install stuff?
+  add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+endif ()
 
 # Compile Options
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
