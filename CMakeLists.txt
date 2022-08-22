@@ -210,5 +210,11 @@ if (APPLE)
   target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit")
   target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Cocoa")
   target_link_libraries(${PROJECT_NAME} PRIVATE "-framework OpenGL")
+
+  install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION . COMPONENT app)
+
+  set(CPACK_COMPONENTS_ALL app)
+  set(CPACK_GENERATOR "DragNDrop")
+  include(CPack)
 endif ()
 
