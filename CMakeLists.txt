@@ -35,7 +35,7 @@ if (NOT raylib_FOUND)
     set(FETCHCONTENT_QUIET NO)
     FetchContent_Populate(raylib)
     set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-    add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
+    add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR} EXCLUDE_FROM_ALL)
   endif ()
 endif ()
 
@@ -54,7 +54,7 @@ if (NOT zep_FOUND)
     set(BUILD_DEMOS OFF CACHE BOOL "" FORCE)
     set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
     set(BUILD_EXTENSIONS OFF CACHE BOOL "" FORCE)
-    add_subdirectory(${zep_SOURCE_DIR} ${zep_BINARY_DIR})
+    add_subdirectory(${zep_SOURCE_DIR} ${zep_BINARY_DIR} EXCLUDE_FROM_ALL)
   endif ()
 endif ()
 
@@ -227,7 +227,10 @@ endif ()
 
 if (MSVC)
   install(TARGETS ${PROJECT_NAME} DESTINATION . COMPONENT app)
-  install(TARGETS "spdlog::spdlog" DESTINATION . COMPONENT app)
+  install(FILES
+      $<TARGET_FILE:spdlog::spdlog>
+      $<TARGET_FILE:fmt::fmt>
+      DESTINATION . COMPONENT app)
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/assets  DESTINATION . COMPONENT app)
 
   set(CPACK_COMPONENTS_ALL app)
