@@ -8,9 +8,9 @@ namespace dorito {
 
     bool wasEnabled = m_Enabled;
 
-    ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize({920, 280}, ImGuiCond_FirstUseEver);
 
-    
+
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 

@@ -209,7 +209,7 @@ namespace dorito {
 
           drawPalette(currentPalette);
           if (ImGui::MenuItem("Set Colors...", nullptr, m_PaletteState[8])) {
-            //  UI::ShowColorEditor = true;
+            EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("Color Editor");
             EnablePalette(8);
           }
 
@@ -267,7 +267,7 @@ namespace dorito {
         if (ImGui::MenuItem(ICON_FA_HEADPHONES " Audio Viewer", nullptr, status["Audio"])) {
           EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("Audio");
         }
-        
+
         ImGui::EndMenu();
       }
 
