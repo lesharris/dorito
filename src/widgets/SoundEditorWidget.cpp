@@ -175,8 +175,8 @@ namespace dorito {
     if (ImGui::Button(ICON_FA_DICE)) {
       std::random_device rnd_device;
       std::mt19937 mt{rnd_device()};
-      std::uniform_int_distribution<uint8_t> dist{0, 1};
-      std::uniform_int_distribution<uint8_t> byteDist{0, 255};
+      std::uniform_int_distribution<uint16_t> dist{0, 1};
+      std::uniform_int_distribution<uint16_t> byteDist{0, 255};
 
       std::generate(m_Pattern.begin(), m_Pattern.end(), [&dist, &mt]() {
         return dist(mt);

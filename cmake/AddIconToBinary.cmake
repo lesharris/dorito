@@ -32,7 +32,7 @@ function(AddIconToBinary appsources)
       if (${icon_type} STREQUAL ".ico")
         set(icon_full_output ${CMAKE_CURRENT_BINARY_DIR}/${icon_name}.ico)
         configure_file(${icon_full} ${icon_full_output} COPYONLY)
-        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${icon_name}.rc.in" "IDI_ICON1        ICON        DISCARDABLE    \"${icon_name}.ico\"\n")
+        file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${icon_name}.rc.in" "IDI_ICON1        ICON        DISCARDABLE    \"${icon_name}.ico\"\nGLFW_ICON ICON \"${icon_name}.ico\"\n")
         add_custom_command(
             OUTPUT "${icon_name}.rc"
             COMMAND ${CMAKE_COMMAND}

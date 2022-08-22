@@ -148,6 +148,13 @@ if (APPLE)
       src/external/mac/FolderManager.h)
 endif ()
 
+if(MSVC)
+  set(SOURCE_FILES ${SOURCE_FILES}
+    platform/WinMainStub.cpp)
+
+  set(WINDOWS 1)
+endif()
+
 # App Icon
 AddIconToBinary(SOURCE_FILES ICONS ${CMAKE_SOURCE_DIR}/platform/dorito.ico ${CMAKE_SOURCE_DIR}/platform/dorito.icns)
 
@@ -217,4 +224,14 @@ if (APPLE)
   set(CPACK_GENERATOR "DragNDrop")
   include(CPack)
 endif ()
+
+if (MSVC)
+  install(TARGETS ${PROJECT_NAME} DESTINATION . COMPONENT app)
+  install(TARGETS "spdlog::spdlog" DESTINATION . COMPONENT app)
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/assets  DESTINATION . COMPONENT app)
+
+  set(CPACK_COMPONENTS_ALL app)
+  set(CPACK_GENERATOR "ZIP")
+  include(CPack)
+endif()
 
