@@ -257,7 +257,7 @@ namespace dorito {
     std::string name = fmt::format(ICON_FA_MICROCHIP " Dorito v{}", DORITO_VERSION);
     std::string repo = fmt::format("https://github.com/lesharris/dorito");
 
-    if (ImGui::BeginPopupModal("About Dorito...", NULL, ImGuiWindowFlags_NoResize)) {
+    if (ImGui::BeginPopupModal("About Dorito...", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)) {
 
       auto &app = Dorito::Get();
       auto &logo = app.GetLogoTexture();
