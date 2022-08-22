@@ -707,9 +707,7 @@ namespace dorito {
     }
 
     prefsFile += "/dorito.prefs";
-#endif
-
-#ifdef WINDOWS
+#else
     std::string prefsFile = "dorito.prefs";
 #endif
 
@@ -731,9 +729,7 @@ namespace dorito {
     }
 
     prefsFile += "/dorito.prefs";
-#endif
-
-#ifdef WINDOWS
+#else
     std::string prefsFile = "dorito.prefs";
 #endif
 

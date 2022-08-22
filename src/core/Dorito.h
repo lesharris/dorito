@@ -69,9 +69,7 @@ namespace dorito {
       logPath += "/dorito.log";
 
       m_LogoPath = folderManager.pathForResource("dorito.png");
-#endif
-
-#ifdef WINDOWS
+#else
       std::string logPath = "dorito.log";
       m_LogoPath = "assets/dorito.png";
 #endif

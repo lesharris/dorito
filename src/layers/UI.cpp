@@ -68,9 +68,7 @@ namespace dorito {
     iniFile += "/imgui.ini";
 
     io.IniFilename = iniFile.c_str();
-#endif
-
-#ifdef WINDOWS
+#else
     std::string monoFont = "assets/fonts/CascadiaMono.ttf";
     std::string iconFont = "assets/fonts/fa-solid-900.ttf";
 #endif
