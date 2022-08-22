@@ -2,6 +2,7 @@
 
 #include <raylib.h>
 #include <vector>
+#include <map>
 
 #include "common/common.h"
 #include "core/Dorito.h"
@@ -48,19 +49,30 @@ namespace dorito {
 
     void EndFrame() override;
 
+    std::map<std::string, bool> GetWidgetStatus() const {
+      std::map<std::string, bool> results;
+
+      for (auto widget: m_Widgets) {
+        results.insert_or_assign(widget->Name(), widget->Enabled());
+      }
+
+      return results;
+    }
+
+    void SetWidgetStatus(const std::map<std::string, bool> statuses) {
+      for (const auto &[name, status]: statuses) {
+        std::string nameBinding = name;
+        auto it = std::find_if(m_Widgets.begin(), m_Widgets.end(), [nameBinding](Ref<Widget> &widget) {
+          return widget->Name() == nameBinding;
+        });
+
+        if (it != std::end(m_Widgets)) {
+          (*it)->Enabled(status);
+        }
+      }
+    }
+
   public:
-    static bool ShowDemo;
-    static bool ShowEmu;
-    static bool ShowMemory;
-    static bool ShowRegisters;
-    static bool ShowDisassembly;
-    static bool ShowAudio;
-    static bool ShowColorEditor;
-    static bool ShowCodeEditor;
-    static bool ShowSoundEditor;
-    static bool ShowSpriteEditor;
-    static bool ShowMonitors;
-    static bool ShowBreakpoints;
     static uint16_t PrevPC;
 
   private:
@@ -73,18 +85,10 @@ namespace dorito {
 
     void HandleResetPC(Events::UIResetPC &event);
 
-    AudioWidget m_Audio;
-    ColorEditorWidget m_ColorEditor;
-    DisassemblyWidget m_Disassembly;
-    EditorWidget m_Editor;
-    MainMenuWidget m_MainMenu;
-    MemoryEditorWidget m_MemoryEditor;
-    RegistersWidget m_Registers;
-    ViewportWidget m_Viewport;
-    SpriteEditorWidget m_SpriteEditor;
-    SoundEditorWidget m_SoundEditor;
-    MonitorsWidget m_Monitors;
-    BreakpointsWidget m_Breakpoints;
+    void HandleToggleEnabled(Events::UIToggleEnabled &event);
+
+  private:
+    std::vector<Ref<Widget>> m_Widgets;
   };
 
 } // dorito

@@ -18,7 +18,8 @@ namespace dorito {
   void to_json(json &j, const DoritoPrefs &dp) {
     j = json{{"isMuted",           dp.isMuted},
              {"recentRoms",        dp.recentRoms},
-             {"recentSourceFiles", dp.recentSourceFiles}};
+             {"recentSourceFiles", dp.recentSourceFiles},
+             {"widgetStatus",      dp.widgetStatus}};
   }
 
   void from_json(const json &j, DoritoPrefs &dp) {
@@ -32,6 +33,9 @@ namespace dorito {
 
     if (j.contains("recentSourceFiles"))
       j.at("recentSourceFiles").get_to(dp.recentSourceFiles);
+
+    if (j.contains("widgetStatus"))
+      j.at("widgetStatus").get_to(dp.widgetStatus);
   }
 
   void to_json(json &j, const GamePrefs &gp) {

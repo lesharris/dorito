@@ -12,6 +12,12 @@ namespace dorito {
       return "MainMenu";
     }
 
+    bool Enabled() const override {
+      return true;
+    }
+
+    void Enabled(bool) override {}
+
   private:
     void UpdateStatus();
 
@@ -249,6 +255,8 @@ namespace dorito {
     };
 
     bool m_About = false;
+
+    bool m_Enabled = true;
   };
 
 } // dorito

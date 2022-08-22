@@ -8,7 +8,11 @@ namespace dorito {
     auto &cpu = bus.GetCpu();
     auto &buffer = bus.GetRam().GetAudioBuffer();
 
-    if (!ImGui::Begin(ICON_FA_HEADPHONES " Audio", &UI::ShowAudio)) {
+    bool wasEnabled = m_Enabled;
+
+    ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin(ICON_FA_HEADPHONES " Audio", &m_Enabled)) {
       ImGui::End();
     } else {
       ImGui::BeginTable("pitch", 1, ImGuiTableFlags_RowBg);
@@ -70,6 +74,10 @@ namespace dorito {
                        0, nullptr, -0.2f, 1.2f,
                        ImVec2(0, 100.0f));
 
+
+      if (!m_Enabled && wasEnabled) {
+        EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
+      }
 
       ImGui::End();
     }

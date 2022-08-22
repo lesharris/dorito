@@ -18,19 +18,6 @@
 
 namespace dorito {
 
-  bool UI::ShowDemo = false;
-  bool UI::ShowEmu = true;
-  bool UI::ShowMemory = true;
-  bool UI::ShowRegisters = true;
-  bool UI::ShowDisassembly = true;
-  bool UI::ShowAudio = true;
-  bool UI::ShowColorEditor = false;
-  bool UI::ShowCodeEditor = true;
-  bool UI::ShowSoundEditor = true;
-  bool UI::ShowSpriteEditor = true;
-  bool UI::ShowMonitors = true;
-  bool UI::ShowBreakpoints = true;
-
   uint16_t UI::PrevPC = 0;
 
 #ifdef APPLE
@@ -85,6 +72,21 @@ namespace dorito {
 
     io.FontGlobalScale = 1.0f / dpi.y;
 
+    m_Widgets = std::vector<Ref<Widget>>{
+        Widget::Create<MainMenuWidget>(),
+        Widget::Create<AudioWidget>(),
+        Widget::Create<ColorEditorWidget>(),
+        Widget::Create<DisassemblyWidget>(),
+        Widget::Create<MemoryEditorWidget>(),
+        Widget::Create<RegistersWidget>(),
+        Widget::Create<ViewportWidget>(),
+        Widget::Create<SpriteEditorWidget>(),
+        Widget::Create<SoundEditorWidget>(),
+        Widget::Create<MonitorsWidget>(),
+        Widget::Create<BreakpointsWidget>(),
+        Widget::Create<EditorWidget>()
+    };
+
     auto glfwWindow = glfwGetCurrentContext();
     ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -97,6 +99,11 @@ namespace dorito {
     EventManager::Get().Attach<
         Events::UIResetPC,
         &::dorito::UI::HandleResetPC
+    >(this);
+
+    EventManager::Get().Attach<
+        Events::UIToggleEnabled,
+        &::dorito::UI::HandleToggleEnabled
     >(this);
   }
 
@@ -157,56 +164,9 @@ namespace dorito {
       ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
     }
 
-    m_MainMenu.Draw();
-
-    // Display Windows
-    {
-
-      if (ShowDemo) {
-        ImGui::ShowDemoWindow(&ShowDemo);
-      }
-
-      if (ShowMemory) {
-        m_MemoryEditor.Draw();
-      }
-
-      if (ShowRegisters) {
-        m_Registers.Draw();
-      }
-
-      if (ShowDisassembly) {
-        m_Disassembly.Draw();
-      }
-
-      if (ShowAudio) {
-        m_Audio.Draw();
-      }
-
-      if (ShowColorEditor) {
-        m_ColorEditor.Draw();
-      }
-
-      if (ShowSpriteEditor) {
-        m_SpriteEditor.Draw();
-      }
-
-      if (ShowSoundEditor) {
-        m_SoundEditor.Draw();
-      }
-
-      if (ShowMonitors) {
-        m_Monitors.Draw();
-      }
-
-      if (ShowBreakpoints) {
-        m_Breakpoints.Draw();
-      }
-
-      if (ShowCodeEditor) {
-        m_Editor.Draw();
-      }
-
-      m_Viewport.Draw();
+    for (auto widget: m_Widgets) {
+      if (widget->Enabled())
+        widget->Draw();
     }
 
     ImGui::End();
@@ -227,6 +187,17 @@ namespace dorito {
     PrevPC = 0;
   }
 
+  void UI::HandleToggleEnabled(Events::UIToggleEnabled &event) {
+    for (auto widget: m_Widgets) {
+
+      if (widget->Name() == event.name) {
+        widget->Enabled(!widget->Enabled());
+
+        EventManager::Dispatcher().enqueue(Events::SaveAppPrefs());
+        break;
+      }
+    }
+  }
 
   /*
    * Utilities

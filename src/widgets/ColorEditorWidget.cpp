@@ -6,6 +6,11 @@ namespace dorito {
   void ColorEditorWidget::Draw() {
     auto &bus = Bus::Get();
 
+    bool wasEnabled = m_Enabled;
+
+    ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
+
+    
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
@@ -34,7 +39,7 @@ namespace dorito {
     ImVec4 fc2Color = colorToImvec(palette[2]);
     ImVec4 blColor = colorToImvec(palette[3]);
 
-    if (!ImGui::Begin(ICON_FA_PALETTE " Edit Colors", &UI::ShowColorEditor)) {
+    if (!ImGui::Begin(ICON_FA_PALETTE " Edit Colors", &m_Enabled)) {
       ImGui::End();
     } else {
 
@@ -75,6 +80,10 @@ namespace dorito {
         EventManager::Dispatcher().enqueue(Events::SavePrefs());
       }
       ImGui::EndTable();
+
+      if (!m_Enabled && wasEnabled) {
+        EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
+      }
 
       ImGui::End();
     }

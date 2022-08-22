@@ -200,6 +200,10 @@ namespace dorito::Events {
     SavePrefs() : Event() {}
   };
 
+  struct SaveAppPrefs : public Event {
+    SaveAppPrefs() : Event() {}
+  };
+
   struct SetMute : public Event {
     SetMute(bool isSet) : Event(), isSet(isSet) {}
 
@@ -216,10 +220,9 @@ namespace dorito::Events {
     UIResetPC() : Event() {}
   };
 
-  struct UISetWidgetEnabled : public Event {
-    UISetWidgetEnabled(const std::string &name, bool isEnabled) : Event(), enabled(isEnabled), name(name) {}
+  struct UIToggleEnabled : public Event {
+    UIToggleEnabled(const std::string &name) : Event(), name(name) {}
 
-    bool enabled;
     std::string name;
   };
 

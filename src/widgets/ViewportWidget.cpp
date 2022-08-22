@@ -18,7 +18,7 @@ namespace dorito {
     window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar | ImGuiDockNodeFlags_NoDockingOverMe;
     ImGui::SetNextWindowClass(&window_class);
 
-    if (!ImGui::Begin("Screen", &UI::ShowEmu,
+    if (!ImGui::Begin("Screen", &m_Enabled,
                       ImGuiWindowFlags_NoScrollbar |
                       ImGuiWindowFlags_NoScrollWithMouse |
                       ImGuiWindowFlags_NoCollapse |

@@ -205,6 +205,8 @@ namespace dorito {
 
     void HandleSavePrefs(const Events::SavePrefs &event);
 
+    void HandleSaveAppPrefs(const Events::SaveAppPrefs &event);
+
     void HandleSetMute(const Events::SetMute &event);
 
     void HandleRunCode(const Events::RunCode &event);

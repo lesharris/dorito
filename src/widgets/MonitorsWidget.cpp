@@ -23,7 +23,11 @@ namespace dorito {
     auto &cpu = bus.GetCpu();
     auto &ram = bus.GetRam().GetMemory();
 
-    if (!ImGui::Begin(ICON_FA_SEARCH " Monitors", &UI::ShowMonitors)) {
+    bool wasEnabled = m_Enabled;
+
+    ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin(ICON_FA_SEARCH " Monitors", &m_Enabled)) {
       ImGui::End();
     } else {
 
@@ -88,6 +92,10 @@ namespace dorito {
       }
 
       ImGui::EndTable();
+
+      if (!m_Enabled && wasEnabled) {
+        EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
+      }
 
       ImGui::End();
     }

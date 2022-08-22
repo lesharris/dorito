@@ -9,8 +9,13 @@ namespace dorito {
   void EditorWidget::Draw() {
     auto &bus = Bus::Get();
 
+    bool wasEnabled = m_Enabled;
+
+    ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
+
+
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    if (!ImGui::Begin(ICON_FA_CODE " Code", &UI::ShowCodeEditor, ImGuiWindowFlags_MenuBar)) {
+    if (!ImGui::Begin(ICON_FA_CODE " Code", &m_Enabled, ImGuiWindowFlags_MenuBar)) {
       ImGui::PopStyleVar();
       ImGui::End();
     } else {
@@ -94,6 +99,10 @@ namespace dorito {
       }
 
       ConfirmSave();
+
+      if (!m_Enabled && wasEnabled) {
+        EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
+      }
 
       ImGui::End();
     }

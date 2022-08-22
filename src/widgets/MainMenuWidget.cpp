@@ -209,7 +209,7 @@ namespace dorito {
 
           drawPalette(currentPalette);
           if (ImGui::MenuItem("Set Colors...", nullptr, m_PaletteState[8])) {
-            UI::ShowColorEditor = true;
+            //  UI::ShowColorEditor = true;
             EnablePalette(8);
           }
 
@@ -219,24 +219,55 @@ namespace dorito {
         ImGui::EndMenu();
       }
 
+      auto &app = Dorito::Get();
+      UI *ui = (UI *) app.GetLayer("ui").get();
+      auto status = ui->GetWidgetStatus();
+
       if (ImGui::BeginMenu("Development")) {
-        ImGui::MenuItem(ICON_FA_CODE " Code Editor", nullptr, &UI::ShowCodeEditor);
+        if (ImGui::MenuItem(ICON_FA_CODE " Code Editor", nullptr, status["Editor"])) {
+          EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("Editor");
+        }
         ImGui::Separator();
-        ImGui::MenuItem(ICON_FA_PAINT_BRUSH " Sprite Editor", nullptr, &UI::ShowSpriteEditor);
-        ImGui::MenuItem(ICON_FA_MUSIC " Sound Editor", nullptr, &UI::ShowSoundEditor);
+        if (ImGui::MenuItem(ICON_FA_PAINT_BRUSH " Sprite Editor", nullptr, status["SpriteEditor"])) {
+          EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("SpriteEditor");
+        }
+
+        if (ImGui::MenuItem(ICON_FA_MUSIC " Sound Editor", nullptr, status["SoundEditor"])) {
+          EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("SoundEditor");
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::MenuItem(ICON_FA_SEARCH " Monitors", nullptr, status["MonitorsWidget"])) {
+          EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("MonitorsWidget");
+        }
+
+        if (ImGui::MenuItem(ICON_FA_CIRCLE " Breakpoints", nullptr, status["Breakpoints"])) {
+          EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("Breakpoints");
+        }
+
         ImGui::EndMenu();
       }
 
       if (ImGui::BeginMenu("Tools")) {
         if (ImGui::BeginMenu("CPU")) {
-          ImGui::MenuItem(ICON_FA_MICROCHIP " Registers", nullptr, &UI::ShowRegisters);
-          ImGui::MenuItem(ICON_FA_BARS " Disassembly", nullptr, &UI::ShowDisassembly);
+          if (ImGui::MenuItem(ICON_FA_MICROCHIP " Registers", nullptr, status["Registers"])) {
+            EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("Registers");
+          }
+          if (ImGui::MenuItem(ICON_FA_BARS " Disassembly", nullptr, status["Disassembly"])) {
+            EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("Disassembly");
+          }
           ImGui::EndMenu();
         }
-        ImGui::MenuItem(ICON_FA_MEMORY " Memory Viewer", nullptr, &UI::ShowMemory);
-        ImGui::MenuItem(ICON_FA_HEADPHONES " Audio Viewer", nullptr, &UI::ShowAudio);
-        ImGui::Separator();
-        ImGui::MenuItem("ImGui Demo", nullptr, &UI::ShowDemo);
+
+        if (ImGui::MenuItem(ICON_FA_MEMORY " Memory Viewer", nullptr, status["MemoryEditor"])) {
+          EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("MemoryEditor");
+        }
+
+        if (ImGui::MenuItem(ICON_FA_HEADPHONES " Audio Viewer", nullptr, status["Audio"])) {
+          EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("Audio");
+        }
+        
         ImGui::EndMenu();
       }
 

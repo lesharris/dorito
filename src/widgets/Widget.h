@@ -4,6 +4,8 @@
 #include <fmt/format.h>
 #include <raylib.h>
 
+#include "common/common.h"
+
 #include "external/imgui/imgui.h"
 #include "external/imgui_extra/imgui_memory_editor.h"
 #include "imgui_internal.h"
@@ -24,13 +26,17 @@ namespace dorito {
 
     virtual std::string Name() { return "Widget"; }
 
+    virtual bool Enabled() const { return m_Enabled; }
+
+    virtual void Enabled(bool isEnabled) { m_Enabled = isEnabled; }
+
   public:
-    bool Enabled() const { return m_Enabled; }
-
-    void Enabled(bool isEnabled) { m_Enabled = isEnabled; }
-
+    template<class T>
+    static Ref<T> Create() {
+      return CreateRef<T>();
+    }
 
   protected:
-    bool m_Enabled;
+    bool m_Enabled = false;
   };
 }

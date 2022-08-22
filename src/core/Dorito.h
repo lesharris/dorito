@@ -52,6 +52,16 @@ namespace dorito {
       return m_ScreenHeight;
     }
 
+    Ref<GameLayer> GetLayer(const std::string &name) {
+      for (auto &layer: *m_GameLayers) {
+        if (layer->Name() == name) {
+          return layer;
+        }
+      }
+
+      return nullptr;
+    }
+
   private:
     Dorito() {
 

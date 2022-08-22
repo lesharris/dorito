@@ -13,8 +13,8 @@ namespace dorito {
     if (!m_GameLayers)
       return;
 
-    m_GameLayers->PushState(CreateRef<Emu>());
     m_GameLayers->PushOverlay(CreateRef<UI>());
+    m_GameLayers->PushState(CreateRef<Emu>());
 
     double lastTime = GetTime();
 

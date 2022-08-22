@@ -7,7 +7,11 @@ namespace dorito {
     auto &bus = Bus::Get();
     auto &cpu = bus.GetCpu();
 
-    if (!ImGui::Begin(ICON_FA_MICROCHIP " Registers", &UI::ShowRegisters)) {
+    bool wasEnabled = m_Enabled;
+
+    ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin(ICON_FA_MICROCHIP " Registers", &m_Enabled)) {
       ImGui::End();
     } else {
 
@@ -171,6 +175,9 @@ namespace dorito {
 
       ImGui::EndTable();
 
+      if (!m_Enabled && wasEnabled) {
+        EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
+      }
 
       ImGui::End();
     }

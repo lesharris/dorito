@@ -3,6 +3,10 @@
 
 #include "config.h"
 
+#include "core/Dorito.h"
+
+#include "layers/UI.h"
+
 #ifdef APPLE
 
   #include "external/mac/FolderManager.h"
@@ -79,6 +83,11 @@ namespace dorito {
     EventManager::Get().Attach<
         Events::SavePrefs,
         &Bus::HandleSavePrefs
+    >(this);
+
+    EventManager::Get().Attach<
+        Events::SaveAppPrefs,
+        &Bus::HandleSaveAppPrefs
     >(this);
 
     EventManager::Get().Attach<
@@ -583,6 +592,11 @@ namespace dorito {
     AddRecentSourceFile(event.path);
   }
 
+
+  void Bus::HandleSaveAppPrefs(const Events::SaveAppPrefs &) {
+    SavePrefs();
+  }
+
   void Bus::AudioCallback(void *buffer, uint32_t frames) {
     static uint32_t cursor = 0;
     std::vector<float> bits;
@@ -689,9 +703,13 @@ namespace dorito {
   }
 
   void Bus::SavePrefs() {
+    auto &app = Dorito::Get();
+    UI *ui = (UI *) app.GetLayer("ui").get();
+
     m_Prefs.isMuted = m_Muted;
     m_Prefs.recentRoms = m_RecentRoms;
     m_Prefs.recentSourceFiles = m_RecentSourceFiles;
+    m_Prefs.widgetStatus = ui->GetWidgetStatus();
 
     json prefs = m_Prefs;
 
@@ -717,6 +735,8 @@ namespace dorito {
   }
 
   void Bus::LoadPrefs() {
+    auto &app = Dorito::Get();
+    UI *ui = (UI *) app.GetLayer("ui").get();
 #ifdef APPLE
     fm::FolderManager folderManager;
 
@@ -741,6 +761,7 @@ namespace dorito {
       m_Muted = m_Prefs.isMuted;
       m_RecentRoms = m_Prefs.recentRoms;
       m_RecentSourceFiles = m_Prefs.recentSourceFiles;
+      ui->SetWidgetStatus(m_Prefs.widgetStatus);
 
       UnloadFileText(prefs);
     }

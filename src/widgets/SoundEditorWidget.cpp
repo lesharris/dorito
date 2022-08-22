@@ -33,7 +33,11 @@ namespace dorito {
   }
 
   void SoundEditorWidget::Draw() {
-    if (!ImGui::Begin(ICON_FA_MUSIC " Sound Editor", &UI::ShowSoundEditor)) {
+    bool wasEnabled = m_Enabled;
+
+    ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin(ICON_FA_MUSIC " Sound Editor", &m_Enabled)) {
       ImGui::End();
     } else {
 
@@ -141,6 +145,10 @@ namespace dorito {
       if (ImGui::Button(ICON_FA_SHARE " Apply to Pattern")) {
         EditorBuffer = ToneBuffer;
         m_Pattern = m_TonePattern;
+      }
+
+      if (!m_Enabled && wasEnabled) {
+        EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
       }
 
       ImGui::End();

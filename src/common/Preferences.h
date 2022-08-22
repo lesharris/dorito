@@ -23,6 +23,8 @@ namespace dorito {
 
     std::vector<std::string> recentRoms;
     std::vector<std::string> recentSourceFiles;
+
+    std::map<std::string, bool> widgetStatus;
   };
 
   void to_json(json &j, const DoritoPrefs &dp);

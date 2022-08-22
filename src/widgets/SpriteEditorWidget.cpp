@@ -6,7 +6,10 @@ namespace dorito {
   void SpriteEditorWidget::Draw() {
     auto &bus = Bus::Get();
 
-    if (!ImGui::Begin(ICON_FA_PAINT_BRUSH " Sprite Editor", &UI::ShowSpriteEditor)) {
+    bool wasEnabled = m_Enabled;
+    ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin(ICON_FA_PAINT_BRUSH " Sprite Editor", &m_Enabled)) {
       ImGui::End();
     } else {
 
@@ -28,6 +31,11 @@ namespace dorito {
       ByteOutput();
 
       ImGui::EndTable();
+
+      if (!m_Enabled && wasEnabled) {
+        EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
+      }
+
       ImGui::End();
     }
   }

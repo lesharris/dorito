@@ -8,7 +8,11 @@ namespace dorito {
     auto &cpu = bus.GetCpu();
     auto &breakpoints = cpu.Breakpoints();
 
-    if (!ImGui::Begin(ICON_FA_CIRCLE " Breakpoints", &UI::ShowBreakpoints)) {
+    bool wasEnabled = m_Enabled;
+
+    ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin(ICON_FA_CIRCLE " Breakpoints", &m_Enabled)) {
       ImGui::End();
     } else {
       ImGui::BeginTable("breakpoints", 4, ImGuiTableFlags_RowBg);
@@ -43,6 +47,10 @@ namespace dorito {
       }
 
       ImGui::EndTable();
+
+      if (!m_Enabled && wasEnabled) {
+        EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
+      }
 
       ImGui::End();
     }
