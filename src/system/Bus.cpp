@@ -184,9 +184,6 @@ namespace dorito {
     SetCompatProfile(m_CompatProfile);
 
     m_UseBeepBuffer = true;
-
-    m_Running = false;
-
     m_RecentRoms.push_back(path);
     std::vector<std::string> roms;
 
@@ -215,6 +212,9 @@ namespace dorito {
 
     SavePrefs();
     LoadGamePrefs();
+
+    m_Running = true;
+    m_Cpu.Halted(false);
   }
 
   void Bus::TickTimers() {

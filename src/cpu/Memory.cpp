@@ -47,6 +47,8 @@ namespace dorito {
     for (auto i = 0; i < 1024 * 64; i++) {
       m_Ram[addr + i] = rom[addr + i];
     }
+
+
   }
 
   void Memory::Reset() {

@@ -115,6 +115,13 @@ namespace dorito {
       }
 
       if (ImGui::BeginMenu("Edit")) {
+
+        if (ImGui::MenuItem(bus.Running() ? ICON_FA_PAUSE " Pause" : ICON_FA_PLAY " Run")) {
+          EventManager::Dispatcher().enqueue<Events::ExecuteCPU>({!bus.Running()});
+        }
+
+        ImGui::Separator();
+
         if (ImGui::MenuItem(ICON_FA_VOLUME_MUTE " Mute Dorito", nullptr, &m_DoritoMuted)) {
           EventManager::Dispatcher().enqueue(Events::SetMute(m_DoritoMuted));
         }
