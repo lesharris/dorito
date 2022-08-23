@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://raw.githubusercontent.com/lesharris/dorito/master/doc/dorito.png" alt="Dorito" style="max-width: 400px;">
+  <img src="https://raw.githubusercontent.com/lesharris/dorito/master/doc/dorito.png" alt="Dorito" width="400px">
 </h1>
 
 <h4 align="center">A Dev Environment for Chip8, SuperChip, and XO-Chip</h4>
