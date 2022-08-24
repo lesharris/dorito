@@ -38,13 +38,13 @@ jobs:
             command: ninja package
             
       - persist_to_workspace:
-          root: dorito/build
+          root: ./dorito/build
           paths:
-            - Dorito-0.5.0-win32.zip
+            - Dorito.zip
 
       - store_artifacts:
-          root: dorito/build
-          path: Dorito-0.5.0-win32.zip
+          root: ./dorito/build
+          path: Dorito.zip
 
   build-macos:
     macos:
@@ -78,8 +78,7 @@ jobs:
           command: |
             mkdir  /Users/distiller/project/kludge
             ln -s /usr/local/bin/python3 /Users/distiller/project/kludge/python
-            export PATH=$PATH:/Users/distiller/project/kludge
-                    
+
       - run:
           name: Build dorito
           working_directory: dorito/build
@@ -105,5 +104,5 @@ workflows:
   version: 2
   build-release:
     jobs:
-     # - build-windows
+      - build-windows
       - build-macos
