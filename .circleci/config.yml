@@ -17,8 +17,9 @@ parameters:
 
 jobs:
   build-windows:
-    executor: win/server-2022
-    resource_class: windows.large
+    executor:
+      name: win/server-2022
+      size: large
     environment:
       repo: $CIRCLE_REPOSITORY_URL
     steps:
