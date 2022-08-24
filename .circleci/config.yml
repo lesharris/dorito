@@ -53,29 +53,38 @@ jobs:
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
-      - run:
-            name: Install pkg-config
-            command: brew install pkg-config
-      - run:
-            name: Install cmake
-            command: brew install cmake
-      - run:
-            name: Install ninja
-            command: brew install ninja
-      - run:
-            name: Checkout dorito
-            command: git clone --recurse-submodules "$CIRCLE_REPOSITORY_URL"
-      - run:
-            name: Configure dorito
-            working_directory: dorito
-            command: |
-                mkdir build
-                cd build
-                cmake -G Ninja ..
+     # - run:
+     ##       name: Install pkg-config
+       #     command: brew install pkg-config
+     # - run:
+      #      name: Install cmake
+       #     command: brew install cmake
+     # - run:
+      #      name: Install ninja
+       #     command: brew install ninja
+    #  - run:
+    ##        name: Checkout dorito
+      #      command: git clone --recurse-submodules "$CIRCLE_REPOSITORY_URL"
+     # - run:
+     #       name: Configure dorito
+     #       working_directory: dorito
+     #       command: |
+     #           mkdir build
+     #           cd build
+     #           cmake -G Ninja ..
                 
       - run: echo `which python`
       - run: echo `which python3`
       - run: echo `pwd`
+      
+      - run:
+        name: Awful Kludge
+        command: |
+          mkdir  /Users/distiller/project/kludge
+          ln -s /usr/local/bin/python3 /Users/distiller/project/kludge/python
+          PATH=$PATH:/Users/distiller/project/kludge
+          
+      - run: echo `which python`
    #   - run:
    ##         name: Build dorito
    #         working_directory: dorito/build
