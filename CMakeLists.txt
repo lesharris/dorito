@@ -64,7 +64,6 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(unofficial-nativefiledialog CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
-find_package(scn CONFIG REQUIRED)
 
 # Source Files
 set(SOURCE_FILES
@@ -210,8 +209,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     EnTT::EnTT
     unofficial::nativefiledialog::nfd
     nlohmann_json::nlohmann_json
-    Zep::Zep
-    scn::scn)
+    Zep::Zep)
 
 if (APPLE)
   target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit")
