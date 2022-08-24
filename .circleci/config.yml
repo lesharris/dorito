@@ -8,10 +8,9 @@ jobs:
   build-windows:
     executor:
       name: win/server-2022
-      shell: pwsh.exe
+      shell: bash.exe
       size: large
     steps:
-      - run: Write-Host "$env"
       - run:
             name: Install cmake
             command: choco install -y cmake
@@ -20,9 +19,7 @@ jobs:
             command: choco install -y ninja
       - run:
             name: Checkout dorito
-            command: git clone --recurse-submodules "$env:repo"
-            environment:
-              repo: $CIRCLE_REPOSITORY_URL
+            command: git clone --recurse-submodules "$CIRCLE_REPOSITORY_URL"
       - run:
             name: Configure dorito
             working_directory: dorito
@@ -75,11 +72,13 @@ jobs:
                 mkdir build
                 cd build
                 cmake -G Ninja ..
+                
+      - run: which python && which python3
       - run:
             name: Build dorito
             working_directory: dorito/build
             command: ninja
-                
+               
       - run:
             name: Package dorito
             working_directory: dorito/build
