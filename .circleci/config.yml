@@ -17,6 +17,9 @@ jobs:
             
       - run: |
           dir "C:\Program Files\CMake\"
+          dir "C:\Program Files\Cmake\bin"
+          dir "C:\Program Files"
+          dir "C:\Program Files\ninja"
         
       - run:
             name: Install ninja
