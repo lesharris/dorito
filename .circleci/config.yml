@@ -21,12 +21,6 @@ jobs:
             
       - checkout
       
-      - run: |
-          dir env:
-        
-      - run: |
-          Write-Host "$Env:CIRCLE_TAG"
-      
       - run:
             name: Update submodules
             command: |
@@ -76,15 +70,16 @@ jobs:
                 popd
                 ninja package
                 mkdir artifacts
-                Copy-Item Dorito.zip -Destination "Dorito-win-$Env:CIRCLE_TAG.zip"
+                Copy-Item Dorito.zip -Destination "artifacts/Dorito-win-$Env:CIRCLE_TAG.zip"
+                dir artifacts
       
       - persist_to_workspace:
           root: ./build/artifacts
           paths:
-            - "Dorito-win-$Env:CIRCLE_TAG.zip"
+            - "Dorito-win-$CIRCLE_TAG.zip"
 
       - store_artifacts:
-          path: "./build/artifacts/Dorito-win-$Env:CIRCLE_TAG.zip"
+          path: "./build/artifacts/Dorito-win-$CIRCLE_TAG.zip"
 
   build-macos:
     macos:
