@@ -19,7 +19,6 @@ jobs:
           dir "C:\Program Files\CMake\"
           dir "C:\Program Files\Cmake\bin"
           dir "C:\Program Files"
-          dir "C:\Program Files\ninja"
         
       - run:
             name: Install ninja
@@ -37,18 +36,24 @@ jobs:
             name: Configure dorito
             working_directory: dorito
             command: |
+                $Env:Path += ";C:\Program Files\Cmake\bin"
                 mkdir build
                 cd build
                 cmake -G Ninja ..
+      
       - run:
             name: Build dorito
             working_directory: dorito/build
-            command: ninja
+            command: |
+              $Env:Path += ";C:\Program Files\Cmake\bin"
+              ninja
                 
       - run:
             name: Package dorito
             working_directory: dorito/build
-            command: ninja package
+            command: |
+               $Env:Path += ";C:\Program Files\Cmake\bin"
+               ninja package
             
       - persist_to_workspace:
           root: ./dorito/build
