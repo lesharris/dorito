@@ -6,9 +6,6 @@ orbs:
 
 jobs:
   build-windows:
-    filter:
-      tags:
-        only: /.*/
     executor:
       name: win/server-2022
       shell: pwsh.exe
@@ -88,9 +85,6 @@ jobs:
           path: build/Dorito.zip
 
   build-macos:
-    filter:
-      tags:
-        only: /.*/
     macos:
       xcode: 13.4.1
     resource_class: macos.x86.medium.gen2
@@ -147,5 +141,8 @@ workflows:
   version: 2
   build-release:
     jobs:
-      - build-windows
+      - build-windows:
+        filters:
+          tags:
+            only: /.*/
       #- build-macos
