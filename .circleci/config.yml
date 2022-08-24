@@ -11,7 +11,7 @@ jobs:
       shell: pwsh.exe
       size: large
     steps:
-      - run: Write-Host "$CIRCLE_REPOSITORY_URL"
+      - run: Write-Host "$env"
       - run:
             name: Install cmake
             command: choco install -y cmake
@@ -59,9 +59,6 @@ jobs:
       - run:
             name: Install pkg-config
             command: brew install pkg-config
-      - run:
-            name: Install python2
-            command: brew install python2
       - run:
             name: Install cmake
             command: brew install cmake
