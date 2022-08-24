@@ -143,8 +143,8 @@ workflows:
     jobs:
       - build-windows:
         filters:
-          tags:
-            only: /.*/
           branches:
             ignore: /.*/
+          tags:
+            only: /.*/
       #- build-macos
