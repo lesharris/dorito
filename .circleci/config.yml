@@ -11,7 +11,8 @@ jobs:
       shell: pwsh.exe
       size: large
     steps:
-      - run: dir env:
+      - run: |
+          dir env:
       - run:
             name: Install cmake
             command: choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
