@@ -23,6 +23,7 @@ jobs:
     environment:
       repo: $CIRCLE_REPOSITORY_URL
     steps:
+      - run: Write-Host "$env:repo"
       - run:
             name: Install cmake
             command: choco install -y cmake
