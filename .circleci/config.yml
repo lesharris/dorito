@@ -18,6 +18,9 @@ parameters:
 jobs:
   build-windows:
     executor: win/server-2022
+    resource_class: windows.large
+    environment:
+      repo: $CIRCLE_REPOSITORY_URL
     steps:
       - run:
             name: Install cmake
@@ -27,7 +30,7 @@ jobs:
             command: choco install -y ninja
       - run:
             name: Checkout dorito
-            command: git clone --recurse-submodules "$CIRCLE_REPOSITORY_URL"
+            command: git clone --recurse-submodules "$env:repo"
       - run:
             name: Configure dorito
             working_directory: dorito
