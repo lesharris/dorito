@@ -8,7 +8,7 @@ jobs:
   build-windows:
     executor:
       name: win/server-2022
-      shell: bash.exe
+      shell: pwsh.exe
       size: large
     steps:
       - run:
@@ -17,9 +17,7 @@ jobs:
       - run:
             name: Install ninja
             command: choco install -y ninja
-      - run:
-            name: Checkout dorito
-            command: git clone --recurse-submodules git@github.com:lesharris/dorito.git
+      - checkout
       - run:
             name: Configure dorito
             working_directory: dorito
@@ -43,8 +41,7 @@ jobs:
             - Dorito.zip
 
       - store_artifacts:
-          root: ./dorito/build
-          path: Dorito.zip
+          path: doritio/build/Dorito.zip
 
   build-macos:
     macos:
@@ -97,12 +94,11 @@ jobs:
            - Dorito.dmg
 
       - store_artifacts:
-          root: ./dorito/build
-          path: Dorito.dmg
+          path: dorito/build/Dorito.dmg
 
 workflows:
   version: 2
   build-release:
     jobs:
       - build-windows
-      - build-macos
+      #- build-macos
