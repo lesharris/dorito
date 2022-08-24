@@ -18,7 +18,6 @@ parameters:
 jobs:
   build-windows:
     executor: win/server-2022
-    resource_class: windows.medium
     steps:
       - run:
             name: Install cmake
