@@ -83,7 +83,9 @@ jobs:
       - run:
           name: Build dorito
           working_directory: dorito/build
-          command: ninja
+          command: |
+            export PATH=$PATH:/Users/distiller/project/kludge
+            ninja
                
       - run:
           name: Package dorito
