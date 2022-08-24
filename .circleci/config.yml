@@ -8,9 +8,10 @@ jobs:
   build-windows:
     executor:
       name: win/server-2022
+      shell: pwsh.exe
       size: large
     steps:
-      - run: Write-Host "$env:repo"
+      - run: Write-Host "$CIRCLE_REPOSITORY_URL"
       - run:
             name: Install cmake
             command: choco install -y cmake
@@ -59,8 +60,8 @@ jobs:
             name: Install pkg-config
             command: brew install pkg-config
       - run:
-            name: Install python
-            command: brew install python
+            name: Install python2
+            command: brew install python2
       - run:
             name: Install cmake
             command: brew install cmake
