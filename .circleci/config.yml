@@ -21,7 +21,7 @@ jobs:
             command: choco install -y ninja
       - run:
             name: Checkout dorito
-            command: git clone --recurse-submodules "$CIRCLE_REPOSITORY_URL"
+            command: git clone --recurse-submodules "$Env:CIRCLE_REPOSITORY_URL"
       - run:
             name: Configure dorito
             working_directory: dorito
