@@ -16,7 +16,7 @@ jobs:
             command: choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
             
       - run: |
-          dir C:\Program files\CMake\
+          dir "C:\Program Files\CMake\"
         
       - run:
             name: Install ninja
