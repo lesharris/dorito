@@ -33,8 +33,8 @@ jobs:
             name: Configure dorito
             command: |
                 $Env:Path += ";C:\Program Files\Cmake\bin"
-                pushd "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools" cmd /c "VsDevCmd.bat&set" |
-                foreach {
+                pushd "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools"
+                cmd /c "VsDevCmd.bat&set" | foreach {
                   if ($_ -match "=") {
                     $v = $_.split("=", 2); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])" 
                   }
