@@ -82,9 +82,11 @@ jobs:
           command: |
             mkdir  /Users/distiller/project/kludge
             ln -s /usr/local/bin/python3 /Users/distiller/project/kludge/python
-            PATH=$PATH:/Users/distiller/project/kludge
+            export PATH=$PATH:/Users/distiller/project/kludge
           
-      - run: echo `which python`
+      - run: |
+          export PATH=$PATH:/Users/distiller/project/kludge
+          echo `which python`
    #   - run:
    ##         name: Build dorito
    #         working_directory: dorito/build
