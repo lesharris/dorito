@@ -31,7 +31,6 @@ jobs:
 
       - run:
             name: Configure dorito
-            working_directory: dorito
             command: |
                 $Env:Path += ";C:\Program Files\Cmake\bin"
                 mkdir build
@@ -40,25 +39,25 @@ jobs:
       
       - run:
             name: Build dorito
-            working_directory: dorito/build
+            working_directory: build
             command: |
               $Env:Path += ";C:\Program Files\Cmake\bin"
               ninja
                 
       - run:
             name: Package dorito
-            working_directory: dorito/build
+            working_directory: build
             command: |
                $Env:Path += ";C:\Program Files\Cmake\bin"
                ninja package
             
       - persist_to_workspace:
-          root: ./dorito/build
+          root: ./build
           paths:
             - Dorito.zip
 
       - store_artifacts:
-          path: doritio/build/Dorito.zip
+          path: build/Dorito.zip
 
   build-macos:
     macos:
