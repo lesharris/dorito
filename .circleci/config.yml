@@ -138,13 +138,12 @@ jobs:
           path: dorito/build/Dorito.dmg
 
 workflows:
-  version: 2
-  build-release:
+  build:
     jobs:
       - build-windows:
-        filters:
-          branches:
-            ignore: /.*/
-          tags:
-            only: /.*/
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
       #- build-macos
