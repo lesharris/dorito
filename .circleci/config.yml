@@ -11,13 +11,16 @@ jobs:
       shell: pwsh.exe
       size: large
     steps:
+      - run: dir env:
       - run:
             name: Install cmake
-            command: choco install -y cmake
+            command: choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
       - run:
             name: Install ninja
             command: choco install -y ninja
-      - checkout
+      - run:
+            name: Checkout dorito
+            command: git clone --recurse-submodules "$CIRCLE_REPOSITORY_URL"
       - run:
             name: Configure dorito
             working_directory: dorito
