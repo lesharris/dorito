@@ -21,7 +21,7 @@ jobs:
       name: win/server-2022
       size: large
     environment:
-      repo: $CIRCLE_REPOSITORY_URL
+      repo: "$CIRCLE_REPOSITORY_URL"
     steps:
       - run: Write-Host "$env:repo"
       - run:
@@ -61,9 +61,13 @@ jobs:
   build-macos:
     macos:
       xcode: 13.4.1
+    resource_class: large
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
+      - run:
+            name: Install pkg-config
+            command: brew install pkg-config
       - run:
             name: Install cmake
             command: brew install cmake
