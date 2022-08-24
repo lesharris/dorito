@@ -53,29 +53,25 @@ jobs:
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
-     # - run:
-     ##       name: Install pkg-config
-       #     command: brew install pkg-config
-     # - run:
-      #      name: Install cmake
-       #     command: brew install cmake
-     # - run:
-      #      name: Install ninja
-       #     command: brew install ninja
-    #  - run:
-    ##        name: Checkout dorito
-      #      command: git clone --recurse-submodules "$CIRCLE_REPOSITORY_URL"
-     # - run:
-     #       name: Configure dorito
-     #       working_directory: dorito
-     #       command: |
-     #           mkdir build
-     #           cd build
-     #           cmake -G Ninja ..
-                
-      - run: echo `which python`
-      - run: echo `which python3`
-      - run: echo `pwd`
+      - run:
+          name: Install pkg-config
+          command: brew install pkg-config
+      - run:
+          name: Install cmake
+          command: brew install cmake
+      - run:
+          name: Install ninja
+          command: brew install ninja
+      - run:
+          name: Checkout dorito
+          command: git clone --recurse-submodules "$CIRCLE_REPOSITORY_URL"
+      - run:
+          name: Configure dorito
+          working_directory: dorito
+          command: |
+            mkdir build
+            cd build
+            cmake -G Ninja ..
       
       - run:
           name: Awful Kludge
@@ -83,28 +79,25 @@ jobs:
             mkdir  /Users/distiller/project/kludge
             ln -s /usr/local/bin/python3 /Users/distiller/project/kludge/python
             export PATH=$PATH:/Users/distiller/project/kludge
-          
-      - run: |
-          export PATH=$PATH:/Users/distiller/project/kludge
-          echo `which python`
-   #   - run:
-   ##         name: Build dorito
-   #         working_directory: dorito/build
-   #         command: ninja
+                    
+      - run:
+          name: Build dorito
+          working_directory: dorito/build
+          command: ninja
                
-   #   - run:
-   #         name: Package dorito
-   #         working_directory: dorito/build
-   #         command: ninja package
+      - run:
+          name: Package dorito
+          working_directory: dorito/build
+          command: ninja package
             
-   #   - persist_to_workspace:
-   #       root: ./dorito/build
-   #       paths:
-   #         - Dorito-0.5.0-Darwin.dmg
+      - persist_to_workspace:
+          root: ./dorito/build
+          paths:
+           - Dorito-0.5.0-Darwin.dmg
 
-    #  - store_artifacts:
-    #      root: ./dorito/build
-    #      path: Dorito-0.5.0-Darwin.dmg
+      - store_artifacts:
+          root: ./dorito/build
+          path: Dorito-0.5.0-Darwin.dmg
 
 workflows:
   version: 2
