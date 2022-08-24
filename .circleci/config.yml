@@ -6,6 +6,9 @@ orbs:
 
 jobs:
   build-windows:
+    filter:
+      tags:
+        only: /.*/
     executor:
       name: win/server-2022
       shell: pwsh.exe
@@ -21,7 +24,11 @@ jobs:
             
       - checkout
       
-      - run: dir
+      - run: |
+        dir :env
+        
+      - run: |
+        Write-Host "$Env:CIRCLE_TAG"
       
       - run:
             name: Update submodules
@@ -40,7 +47,6 @@ jobs:
                   }
                 }
                 popd
-                Write-Host "`nVisual Studio 2022 Command Prompt variables set." -ForegroundColor Yellow
                 mkdir build
                 cd build
                 cmake -G Ninja ".."
@@ -57,7 +63,6 @@ jobs:
                   }
                 }
                 popd
-                Write-Host "`nVisual Studio 2022 Command Prompt variables set." -ForegroundColor Yellow
                 ninja
                 
       - run:
@@ -72,7 +77,6 @@ jobs:
                   }
                 }
                 popd
-                Write-Host "`nVisual Studio 2022 Command Prompt variables set." -ForegroundColor Yellow
                 ninja package
             
       - persist_to_workspace:
@@ -84,6 +88,9 @@ jobs:
           path: build/Dorito.zip
 
   build-macos:
+    filter:
+      tags:
+        only: /.*/
     macos:
       xcode: 13.4.1
     resource_class: macos.x86.medium.gen2
