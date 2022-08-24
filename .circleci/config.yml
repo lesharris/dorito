@@ -19,7 +19,7 @@ jobs:
             command: choco install -y ninja
       - run:
             name: Checkout dorito
-            command: git clone --recurse-submodules "$CIRCLE_REPOSITORY_URL"
+            command: git clone --recurse-submodules git@github.com:lesharris/dorito.git
       - run:
             name: Configure dorito
             working_directory: dorito
@@ -75,24 +75,25 @@ jobs:
                 
       - run: echo `which python`
       - run: echo `which python3`
-      - run:
-            name: Build dorito
-            working_directory: dorito/build
-            command: ninja
+      - run: echo `pwd`
+   #   - run:
+   ##         name: Build dorito
+   #         working_directory: dorito/build
+   #         command: ninja
                
-      - run:
-            name: Package dorito
-            working_directory: dorito/build
-            command: ninja package
+   #   - run:
+   #         name: Package dorito
+   #         working_directory: dorito/build
+   #         command: ninja package
             
-      - persist_to_workspace:
-          root: ./dorito/build
-          paths:
-            - Dorito-0.5.0-Darwin.dmg
+   #   - persist_to_workspace:
+   #       root: ./dorito/build
+   #       paths:
+   #         - Dorito-0.5.0-Darwin.dmg
 
-      - store_artifacts:
-          root: ./dorito/build
-          path: Dorito-0.5.0-Darwin.dmg
+    #  - store_artifacts:
+    #      root: ./dorito/build
+    #      path: Dorito-0.5.0-Darwin.dmg
 
 workflows:
   version: 2
