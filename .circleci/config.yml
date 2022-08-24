@@ -58,7 +58,7 @@ jobs:
                 }
                 popd
                 Write-Host "`nVisual Studio 2022 Command Prompt variables set." -ForegroundColor Yellow
-              ninja
+                ninja
                 
       - run:
             name: Package dorito
@@ -73,7 +73,7 @@ jobs:
                 }
                 popd
                 Write-Host "`nVisual Studio 2022 Command Prompt variables set." -ForegroundColor Yellow
-               ninja package
+                ninja package
             
       - persist_to_workspace:
           root: ./build
