@@ -6,9 +6,7 @@
     "fmt",
     "spdlog",
     "entt",
-    "catch2",
     "nativefiledialog",
-    "nlohmann-json",
-    "scnlib"
+    "nlohmann-json"
   ]
 }
