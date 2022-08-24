@@ -95,11 +95,11 @@ jobs:
       - persist_to_workspace:
           root: ./dorito/build
           paths:
-           - Dorito-0.5.0-Darwin.dmg
+           - Dorito.dmg
 
       - store_artifacts:
           root: ./dorito/build
-          path: Dorito-0.5.0-Darwin.dmg
+          path: Dorito.dmg
 
 workflows:
   version: 2
