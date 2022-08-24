@@ -21,10 +21,10 @@ jobs:
     steps:
       - run:
             name: Install cmake
-            command: choco install cmake
+            command: choco install -y cmake
       - run:
             name: Install ninja
-            command: choco install ninja
+            command: choco install -y ninja
       - run:
             name: Checkout dorito
             command: git clone --recurse-submodules "$CIRCLE_REPOSITORY_URL"
