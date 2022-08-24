@@ -21,6 +21,8 @@ jobs:
             
       - checkout
       
+      - run: dir
+      
       - run:
             name: Update submodules
             command: |
@@ -34,7 +36,7 @@ jobs:
                 $Env:Path += ";C:\Program Files\Cmake\bin"
                 mkdir build
                 cd build
-                cmake -G Ninja ..
+                cmake -G Ninja ".."
       
       - run:
             name: Build dorito
