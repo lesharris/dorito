@@ -78,11 +78,11 @@ jobs:
       - run: echo `pwd`
       
       - run:
-        name: Awful Kludge
-        command: |
-          mkdir  /Users/distiller/project/kludge
-          ln -s /usr/local/bin/python3 /Users/distiller/project/kludge/python
-          PATH=$PATH:/Users/distiller/project/kludge
+          name: Awful Kludge
+          command: |
+            mkdir  /Users/distiller/project/kludge
+            ln -s /usr/local/bin/python3 /Users/distiller/project/kludge/python
+            PATH=$PATH:/Users/distiller/project/kludge
           
       - run: echo `which python`
    #   - run:
