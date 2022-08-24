@@ -25,10 +25,10 @@ jobs:
       - checkout
       
       - run: |
-        dir :env
+          dir env:
         
       - run: |
-        Write-Host "$Env:CIRCLE_TAG"
+          Write-Host "$Env:CIRCLE_TAG"
       
       - run:
             name: Update submodules
