@@ -45,20 +45,24 @@ The primary focuses for **Dorito** are:
 
 ## Installation
 
-**Dorito** currently provides binary builds for Windows and MacOS (x86 and Apple Silicon)  Linux support should be there
+**Dorito** currently provides [binary builds](https://github.com/lesharris/dorito/releases) for Windows and MacOS (x86
+and Apple Silicon)  Linux support should be
+there
 from a 'compiling the source' standpoint but work remains on packaging Dorito for Linux. Is Snap the way to go these
 days? Linux folks, would love some feedback here.
 
-Dorito uses Cmake's FetchContent along with vcpkg for dependency management. To build from source, the following recipe
+Dorito uses Cmake's FetchContent along with vcpkg for dependency management. Ninja is also the preferred build system.
+To build from
+source, the following recipe
 should be all that is needed:
 
 ```
 $ git clone https://github.com/lesharris/dorito.git
 $ cd dorito
 $ git submodule update --init --recursive
-$ mdkir build
+$ mkdir build
 $ cd build
-$ cmake ..
+$ cmake -G Ninja ..
 $ ninja
 ```
 
@@ -125,6 +129,7 @@ color!
 | CPU Profiling                              |        |  ✔   |
 | Octo Cartridges                            |        |  ✔   |
 | Standalone Static Analysis disassembler    |        |  ✔   |
+| Multiple Font choices                      |        |  ✔   |
 | Chip flavored Name                         |   ✔    |      |
 | Sea creature flavored Name                 |        |  ✔   |
 
