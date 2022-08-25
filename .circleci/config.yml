@@ -40,7 +40,7 @@ jobs:
                 popd
                 mkdir build
                 cd build
-                cmake -G Ninja ".."
+                cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ".."
       
       - run:
             name: Build dorito
@@ -109,7 +109,7 @@ jobs:
           command: |
             mkdir build
             cd build
-            cmake -G Ninja ..
+            cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
       
       - run:
           name: Awful Kludge
@@ -146,7 +146,7 @@ jobs:
       - attach_workspace:
           at: .
       - github-release/release:
-          tag: 'v$CIRCLE_TAG'
+          tag: '$CIRCLE_TAG'
           title: 'Dorito v$CIRCLE_TAG'
           artefacts-folder: artifacts
 
