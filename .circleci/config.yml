@@ -74,12 +74,12 @@ jobs:
                 dir ~/project/artifacts
       
       - persist_to_workspace:
-          root: ./project
+          root: .
           paths:
             - artifacts
 
       - store_artifacts:
-          path: project/artifacts
+          path: artifacts
 
   build-macos:
     macos:
