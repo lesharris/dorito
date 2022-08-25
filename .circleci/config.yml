@@ -130,7 +130,9 @@ jobs:
           command: |
             ninja package
             mkdir ~/project/artifacts
-            cp Dorito.dmg "~/project/artifacts/Dorito-mac-$CIRCLE_TAG.dmg"
+            ls ~/project
+            ls
+            cp ./Dorito.dmg "~/project/artifacts/Dorito-mac-$CIRCLE_TAG.dmg"
             ls ~/project/artifacts
             
       - persist_to_workspace:
