@@ -88,7 +88,7 @@ jobs:
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
-      - run: ls
+      - run: pwd
       - run:
           name: Install pkg-config
           command: brew install pkg-config
@@ -127,15 +127,17 @@ jobs:
           working_directory: dorito/build
           command: |
             ninja package
-            cp Dorito.dmg "Dorito-mac-$CIRCLE_TAG.dmg"
+            mkdir ~/project/artifacts
+            cp Dorito.dmg "~/project/artifacts/Dorito-mac-$CIRCLE_TAG.dmg"
+            ls ~/project/artifacts
             
       - persist_to_workspace:
-          root: ./dorito/build
+          root: .
           paths:
-           - Dorito.dmg
+           - artifacts
 
       - store_artifacts:
-          path: dorito/build/Dorito.dmg
+          path: artifacts
 
 workflows:
   build:
