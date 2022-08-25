@@ -88,6 +88,7 @@ jobs:
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
+      - run: ls
       - run:
           name: Install pkg-config
           command: brew install pkg-config
@@ -137,10 +138,15 @@ jobs:
 workflows:
   build:
     jobs:
-      - build-windows:
+  #    - build-windows:
+   #       filters:
+    #        branches:
+     #         ignore: /.*/
+      #      tags:
+       #       only: /.*/
+      - build-macos:
           filters:
             branches:
               ignore: /.*/
             tags:
               only: /.*/
-      #- build-macos
