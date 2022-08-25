@@ -125,7 +125,9 @@ jobs:
       - run:
           name: Package dorito
           working_directory: dorito/build
-          command: ninja package
+          command: |
+            ninja package
+            cp Dorito.dmg "Dorito-mac-$CIRCLE_TAG.dmg"
             
       - persist_to_workspace:
           root: ./dorito/build
