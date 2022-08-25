@@ -129,11 +129,11 @@ jobs:
           working_directory: dorito/build
           command: |
             ninja package
-            mkdir ~/project/artifacts
-            ls ~/project
-            ls
-            cp ./Dorito.dmg "~/project/artifacts/Dorito-mac-$CIRCLE_TAG.dmg"
-            ls ~/project/artifacts
+            mkdir -v /Users/distiller/project/artifacts
+            ls -lv /Users/distiller/project
+            ls -lv
+            cp /Users/distiller/project/dorito/build/Dorito.dmg /Users/distiller/project/artifacts/Dorito-mac-$CIRCLE_TAG.dmg
+            ls -lv /Users/distiller/project/dorito/build/Dorito.dmg
             
       - persist_to_workspace:
           root: .
