@@ -88,7 +88,9 @@ jobs:
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
-      - run: pwd
+      - run: |
+          cd ~
+          pwd
       - run:
           name: Install pkg-config
           command: brew install pkg-config
