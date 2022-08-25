@@ -130,10 +130,7 @@ jobs:
           command: |
             ninja package
             mkdir -v /Users/distiller/project/artifacts
-            ls -lv /Users/distiller/project
-            ls -lv
             cp /Users/distiller/project/dorito/build/Dorito.dmg /Users/distiller/project/artifacts/Dorito-mac-$CIRCLE_TAG.dmg
-            ls -lv /Users/distiller/project/dorito/build/Dorito.dmg
             
       - persist_to_workspace:
           root: .
@@ -143,16 +140,36 @@ jobs:
       - store_artifacts:
           path: artifacts
 
+  release:
+    executor: github-release/default
+    steps:
+      - attach_workspace:
+          at: .
+      - github-release/release:
+          tag: 'v$CIRCLE_TAG'
+          title: 'Dorito v$CIRCLE_TAG'
+          artefacts-folder: artifacts
+
 workflows:
-  build:
+  Release Dorito:
     jobs:
-  #    - build-windows:
-   #       filters:
-    #        branches:
-     #         ignore: /.*/
-      #      tags:
-       #       only: /.*/
+      - build-windows:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
       - build-macos:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
+      - release:
+          requires:
+            - build-windows
+            - build-macos
+          context: github
           filters:
             branches:
               ignore: /.*/
