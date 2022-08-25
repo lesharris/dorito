@@ -72,13 +72,14 @@ jobs:
                 mkdir ~/artifacts
                 Copy-Item Dorito.zip -Destination "~/artifacts/Dorito-win-$Env:CIRCLE_TAG.zip"
                 dir ~/artifacts
+                dir ~
       
       - persist_to_workspace:
           paths:
-            - ~/artifacts
+            - artifacts
 
       - store_artifacts:
-          path: ~/artifacts
+          path: artifacts
 
   build-macos:
     macos:
