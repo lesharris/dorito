@@ -69,18 +69,17 @@ jobs:
                 }
                 popd
                 ninja package
-                mkdir ~/artifacts
-                Copy-Item Dorito.zip -Destination "~/artifacts/Dorito-win-$Env:CIRCLE_TAG.zip"
-                dir ~/artifacts
-                dir ~
+                mkdir ~/project/artifacts
+                Copy-Item Dorito.zip -Destination "~/project/artifacts/Dorito-win-$Env:CIRCLE_TAG.zip"
+                dir ~/project/artifacts
       
       - persist_to_workspace:
-          root: .
+          root: ./project
           paths:
             - artifacts
 
       - store_artifacts:
-          path: artifacts
+          path: project/artifacts
 
   build-macos:
     macos:
