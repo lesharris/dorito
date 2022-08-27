@@ -185,9 +185,17 @@ namespace dorito {
           m_editor->SetGlobalMode(Zep::ZepMode_Vim::StaticName());
           handled = true;
         } else if (ImGui::IsKeyPressed('V')) {
-          auto pos = m_editor->GetActiveBuffer()->GetLastEditLocation();
+          auto window = m_editor->GetActiveWindow();
+          auto pos = window->GetBufferCursor();
+          auto abuffer = m_editor->GetActiveBuffer();
+
           Zep::ChangeRecord changeRecord;
-          m_editor->GetActiveBuffer()->Insert(pos, ImGui::GetClipboardText(), changeRecord);
+
+          abuffer->Insert(pos, ImGui::GetClipboardText(), changeRecord);
+
+          pos = pos + changeRecord.strInserted.size();
+
+          window->SetBufferCursor(pos);
           handled = true;
         } else {
           for (int ch = 'A'; ch <= 'Z'; ch++) {
