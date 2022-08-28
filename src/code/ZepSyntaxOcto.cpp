@@ -37,7 +37,7 @@ namespace dorito {
     assert(std::distance(itrCurrent, itrEnd) < int(m_syntax.size()));
     assert(m_syntax.size() == buffer.size());
 
-    static const std::string delim(" \r\v\n\t+*/&|^!~%#$<>=,(){}[]");
+    static const std::string delim(" \r\v\n\t*/&|^!~%#$<>,=(){}[]");
     static const std::string whiteSpace(" \t\v\r\n");
     static const std::string delimWithDot = delim + ".";
 
@@ -166,6 +166,36 @@ namespace dorito {
         }
       }
 
+      if (ch == 'v') {
+        if (peek(1) == '\n') {
+          itrCurrent++;
+          continue;
+        }
+
+        auto itrLeft = itrCurrent;
+        auto itrRight = itrLeft;
+
+        itrRight++;
+
+        while (itrRight < itrEnd) {
+          if (!std::isdigit(*itrRight)) {
+            itrRight++;
+            mark(itrLeft, itrRight, Zep::ThemeColor::String, Zep::ThemeColor::None);
+
+            itrCurrent = itrRight;
+            break;
+          }
+
+          itrRight++;
+        }
+
+        if (itrRight >= itrEnd) {
+          break;
+        }
+
+        continue;
+      }
+
       if (ch == '"') {
         if (peek(1) == '\n') {
           itrCurrent++;
@@ -224,7 +254,7 @@ namespace dorito {
         continue;
       } else {
         mark(firstChar, lastChar, Zep::ThemeColor::Normal, Zep::ThemeColor::None);
-        //itrCurrent = lastChar;
+        itrCurrent = lastChar;
       }
 
       auto parseHex = [&](decltype(firstChar) itr, decltype(firstChar) &last) -> bool {
