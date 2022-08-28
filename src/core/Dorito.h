@@ -9,18 +9,9 @@
 #include <spdlog/sinks/basic_file_sink.h>
 
 #include "common/common.h"
+#include "common/Resources.h"
 #include "core/layers/GameLayerStack.h"
 #include "core/events/EventManager.h"
-
-#include <iostream>
-#include <filesystem>
-
-
-#ifdef APPLE
-
-  #include "external/mac/FolderManager.h"
-
-#endif
 
 namespace dorito {
 
@@ -64,25 +55,9 @@ namespace dorito {
 
   private:
     Dorito() {
-
-#ifdef APPLE
-      fm::FolderManager folderManager;
-
-      std::string logPath = (char *) folderManager.pathForDirectory(fm::NSApplicationSupportDirectory,
-                                                                    fm::NSUserDirectory);
-      logPath += "/Dorito";
-
-      if (!DirectoryExists(logPath.c_str())) {
-        std::filesystem::create_directory(logPath);
-      }
-
-      logPath += "/dorito.log";
-
-      m_LogoPath = folderManager.pathForResource("dorito.png");
-#else
-      std::string logPath = "dorito.log";
-      m_LogoPath = "assets/dorito.png";
-#endif
+      auto &resourceManager = Resources::Get();
+      std::string logPath = resourceManager.ConfigDirectory() + "/dorito.log";
+      m_LogoPath = resourceManager.ImagePath("dorito.png");
 
       auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
       auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath, true);
