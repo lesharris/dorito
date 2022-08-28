@@ -1,17 +1,11 @@
 #include <spdlog/spdlog.h>
 #include "Bus.h"
 
-#include "config.h"
+#include "common/Resources.h"
 
 #include "core/Dorito.h"
 
 #include "layers/UI.h"
-
-#ifdef APPLE
-
-  #include "external/mac/FolderManager.h"
-
-#endif
 
 namespace dorito {
   Bus::Bus() {
@@ -98,6 +92,11 @@ namespace dorito {
     EventManager::Get().Attach<
         Events::RunCode,
         &Bus::HandleRunCode
+    >(this);
+
+    EventManager::Get().Attach<
+        Events::LoadCode,
+        &Bus::HandleLoadCode
     >(this);
 
     EventManager::Get().Attach<
@@ -578,12 +577,22 @@ namespace dorito {
     m_Running = true;
   }
 
+  void Bus::HandleLoadCode(const Events::LoadCode &event) {
+    m_Cpu.Reset();
+    m_Display.Reset();
+    m_Ram.Reset();
+    m_Ram.LoadRom(event.rom);
+
+    m_Cpu.Halted(true);
+    m_Running = false;
+  }
+
   void Bus::HandleClearRecents(const Events::UIClearRecents &) {
     m_RecentRoms.clear();
     SavePrefs();
   }
 
-  void Bus::HandleClearRecentSources(const Events::UIClearRecentSources &event) {
+  void Bus::HandleClearRecentSources(const Events::UIClearRecentSources &) {
     m_RecentSourceFiles.clear();
     SavePrefs();
   }
@@ -713,21 +722,8 @@ namespace dorito {
 
     json prefs = m_Prefs;
 
-#ifdef APPLE
-    fm::FolderManager folderManager;
-
-    std::string prefsFile = (char *) folderManager.pathForDirectory(fm::NSApplicationSupportDirectory,
-                                                                    fm::NSUserDirectory);
-    prefsFile += "/Dorito";
-
-    if (!DirectoryExists(prefsFile.c_str())) {
-      std::filesystem::create_directory(prefsFile);
-    }
-
-    prefsFile += "/dorito.prefs";
-#else
-    std::string prefsFile = "dorito.prefs";
-#endif
+    auto &rm = Resources::Get();
+    std::string prefsFile = rm.ConfigDirectory() + "/dorito.prefs";
 
     if (!SaveFileText(prefsFile.c_str(), (char *) to_string(prefs).c_str())) {
       spdlog::get("console")->warn("Could not save preferences!");
@@ -737,21 +733,9 @@ namespace dorito {
   void Bus::LoadPrefs() {
     auto &app = Dorito::Get();
     UI *ui = (UI *) app.GetLayer("ui").get();
-#ifdef APPLE
-    fm::FolderManager folderManager;
 
-    std::string prefsFile = (char *) folderManager.pathForDirectory(fm::NSApplicationSupportDirectory,
-                                                                    fm::NSUserDirectory);
-    prefsFile += "/Dorito";
-
-    if (!DirectoryExists(prefsFile.c_str())) {
-      std::filesystem::create_directory(prefsFile);
-    }
-
-    prefsFile += "/dorito.prefs";
-#else
-    std::string prefsFile = "dorito.prefs";
-#endif
+    auto &rm = Resources::Get();
+    std::string prefsFile = rm.ConfigDirectory() + "/dorito.prefs";
 
     auto prefs = LoadFileText(prefsFile.c_str());
 

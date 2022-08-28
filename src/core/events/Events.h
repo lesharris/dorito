@@ -216,6 +216,12 @@ namespace dorito::Events {
     const char *rom;
   };
 
+  struct LoadCode : public Event {
+    explicit LoadCode(const char *rom) : Event(), rom(rom) {}
+
+    const char *rom;
+  };
+
   struct UIResetPC : public Event {
     UIResetPC() : Event() {}
   };
@@ -253,5 +259,9 @@ namespace dorito::Events {
     int32_t len;
     char *format;
     char *name;
+  };
+
+  struct ToggleImguiDemo : public Event {
+    ToggleImguiDemo() : Event() {}
   };
 }

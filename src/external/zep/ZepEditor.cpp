@@ -8,7 +8,7 @@
 #include "code/ZepSyntaxOcto.h"
 
 namespace dorito {
-  CodeEditor::CodeEditor(const std::string &name)
+  CodeEditor::CodeEditor()
       : m_editor(std::make_unique<Zep::ZepEditor>(
       new Zep::ZepDisplay_ImGui(),
       Zep::ZepPath(""),
@@ -17,21 +17,17 @@ namespace dorito {
 
     m_editor->RegisterCallback(this);
 
-    Zep::ZepRegressExCommand::Register(*m_editor);
-
     auto &config = m_editor->GetConfig();
     config.autoHideCommandRegion = false;
-    config.showNormalModeKeyStrokes = true;
+    config.showNormalModeKeyStrokes = false;
 
     ZepSyntaxOcto::registerSyntax(m_editor);
 
-    m_editor->InitWithText(name, "");
+    m_editor->AddTabWindow();
     m_editor->SetGlobalMode(Zep::ZepMode_Standard::StaticName());
-    m_editor->GetActiveBuffer()->Clear();
-    m_editor->GetActiveBuffer()->SetFileFlags(Zep::FileFlags::Dirty, false);
   }
 
-  void CodeEditor::draw() {
+  void CodeEditor::Draw() {
     auto dpiScale = ImGui::GetWindowDpiScale();
 
     if (!m_dpiScale.has_value() || (m_dpiScale.value() != dpiScale)) {
@@ -73,6 +69,7 @@ namespace dorito {
     if (io.MouseClicked[0]) {
       if (m_editor->OnMouseDown(Zep::toNVec2f(io.MousePos), Zep::ZepMouseButton::Left)) {
         // Hide the mouse click from imgui if we handled it
+
         io.MouseClicked[0] = false;
       }
     }
@@ -124,9 +121,17 @@ namespace dorito {
       if (io.KeyShift) {
         mod |= Zep::ModifierKey::Shift;
       }
-      bool super = io.KeySuper;
 
-      auto pWindow = m_editor->GetActiveTabWindow()->GetActiveWindow();
+      auto pTabWindow = m_editor->GetActiveTabWindow();
+
+      if (!pTabWindow)
+        return;
+
+      auto pWindow = pTabWindow->GetActiveWindow();
+
+      if (!pWindow)
+        return;
+
       const auto &buffer = pWindow->GetBuffer();
 
       // Check USB Keys
@@ -235,6 +240,9 @@ namespace dorito {
       message->handled = true;
     } else if (message->messageId == Zep::Msg::RequestQuit) {
       message->handled = true;
+    } else if (message->messageId == Zep::Msg::MouseDown) {
+      // auto disp = m_editor->GetActiveWindow()->BufferToDisplay();
+      //message->handled = false;
     }
   }
 }

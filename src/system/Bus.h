@@ -211,6 +211,8 @@ namespace dorito {
 
     void HandleRunCode(const Events::RunCode &event);
 
+    void HandleLoadCode(const Events::LoadCode &event);
+
     void HandleClearRecents(const Events::UIClearRecents &event);
 
     void HandleClearRecentSources(const Events::UIClearRecentSources &event);

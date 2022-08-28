@@ -17,7 +17,7 @@
 namespace dorito {
   class CodeEditor final : public Zep::IZepComponent {
   public:
-    CodeEditor(const std::string &name);
+    CodeEditor();
 
     virtual ~CodeEditor() {};
 
@@ -26,7 +26,7 @@ namespace dorito {
       m_editor.reset();
     }
 
-    void draw();
+    void Draw();
 
     virtual Zep::ZepEditor &GetEditor() const override final { return *m_editor; }
 
