@@ -10,7 +10,7 @@ namespace dorito {
     bool wasEnabled = m_Enabled;
 
     ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
-    
+
     if (!ImGui::Begin(ICON_FA_BARS " Disassembly", &m_Enabled)) {
       ImGui::End();
     } else {
@@ -55,7 +55,7 @@ namespace dorito {
             ImGui::TableNextRow();
 
             if (!lineHighlite && (line.index == lines.size() - 1 ||
-                                  line.addr == cpu.m_PrevPC)) {
+                                  line.addr == cpu.regs.pc)) {
               ImU32 row_bg_color = ImGui::GetColorU32(ImVec4(0.18f, 0.47f, 0.59f, 0.65f));
               ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, row_bg_color);
               lineHighlite = true;
