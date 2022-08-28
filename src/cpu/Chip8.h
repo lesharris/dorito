@@ -299,6 +299,8 @@ namespace dorito {
 
     friend class MonitorsWidget;
 
+    friend class EditorWidget;
+    
     friend class AudioWidget;
 
     friend class Bus;

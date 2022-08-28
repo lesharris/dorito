@@ -1,64 +1,36 @@
-#include "config.h"
-
-#include "UI.h"
-#include "imgui_internal.h"
-
 #include <zep.h>
 #include <raylib.h>
 
-#include "system/Bus.h"
+#include "UI.h"
+#include "imgui_internal.h"
+#include "common/Resources.h"
 
+#include "system/Bus.h"
 #include "external/IconsFontAwesome5.h"
 
-#ifdef APPLE
-
-  #include "external/mac/FolderManager.h"
-
-#endif
-
 namespace dorito {
-
   uint16_t UI::PrevPC = 0;
-
-#ifdef APPLE
-  std::string iniFile;
-#endif
-
 
   void UI::OnAttach() {
     ImGui::CreateContext(nullptr);
 
     ImGuiIO &io = ImGui::GetIO();
 
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+    io.ConfigFlags |= ImGuiConfigFlags_NavNoCaptureKeyboard;
 
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
-#ifdef APPLE
-    fm::FolderManager folderManager;
+    auto &resourceManager = Resources::Get();
 
-    std::string monoFont = folderManager.pathForResource("CascadiaMono.ttf");
-    std::string iconFont = folderManager.pathForResource("fa-solid-900.ttf");
+    std::string monoFont = resourceManager.FontPath("CascadiaMono.ttf");
+    std::string iconFont = resourceManager.FontPath("fa-solid-900.ttf");
 
-    iniFile = (char *) folderManager.pathForDirectory(fm::NSApplicationSupportDirectory,
-                                                      fm::NSUserDirectory);
-    iniFile += "/Dorito";
+    m_IniPath = resourceManager.ConfigDirectory() + "/imgui.ini";
 
-    if (!DirectoryExists(iniFile.c_str())) {
-      std::filesystem::create_directory(iniFile);
-    }
-
-    iniFile += "/imgui.ini";
-
-    io.IniFilename = iniFile.c_str();
-#else
-    std::string monoFont = "assets/fonts/CascadiaMono.ttf";
-    std::string iconFont = "assets/fonts/fa-solid-900.ttf";
-#endif
+    io.IniFilename = m_IniPath.c_str();
 
     // Render fonts at half scale for sharper fonts.
     auto dpi = GetWindowScaleDPI();
@@ -104,6 +76,11 @@ namespace dorito {
     EventManager::Get().Attach<
         Events::UIToggleEnabled,
         &::dorito::UI::HandleToggleEnabled
+    >(this);
+
+    EventManager::Get().Attach<
+        Events::ToggleImguiDemo,
+        &::dorito::UI::HandleToggleImguiDemo
     >(this);
   }
 
@@ -169,6 +146,10 @@ namespace dorito {
         widget->Draw();
     }
 
+    if (m_ShowImGuiDemo) {
+      ImGui::ShowDemoWindow();
+    }
+
     ImGui::End();
   }
 
@@ -232,6 +213,10 @@ namespace dorito {
         };
 
     draw_list->AddImageQuad(tex_id, pos[0], pos[1], pos[2], pos[3], uvs[0], uvs[1], uvs[2], uvs[3], IM_COL32_WHITE);
+  }
+
+  void UI::HandleToggleImguiDemo(Events::ToggleImguiDemo &) {
+    m_ShowImGuiDemo = !m_ShowImGuiDemo;
   }
 
 } // dorito

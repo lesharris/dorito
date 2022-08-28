@@ -87,8 +87,12 @@ namespace dorito {
 
     void HandleToggleEnabled(Events::UIToggleEnabled &event);
 
+    void HandleToggleImguiDemo(Events::ToggleImguiDemo &event);
+
   private:
     std::vector<Ref<Widget>> m_Widgets;
+    std::string m_IniPath;
+    bool m_ShowImGuiDemo = false;
   };
 
 } // dorito
