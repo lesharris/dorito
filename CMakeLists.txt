@@ -98,8 +98,8 @@ set(SOURCE_FILES
     src/external/zep/ZepEditor.h
     src/external/zep/mode_repl.cpp
     src/external/zep/mode_repl.h
+    src/external/octo_compiler.cpp
     src/external/octo_compiler.h
-    src/external/octo_compiler.c
     src/common/common.cpp
     src/cpu/Chip8.cpp
     src/cpu/Chip8.h
@@ -139,20 +139,26 @@ set(SOURCE_FILES
     src/widgets/BreakpointsWidget.cpp
     src/widgets/BreakpointsWidget.h
     src/external/IconsFontAwesome5.h
-    src/external/imgui-knobs.cpp)
+    src/external/imgui-knobs.cpp
+    src/code/BreakpointEditorWidget.h
+    src/code/BreakpointEditorWidget.cpp
+    src/common/Resources.cpp
+    src/common/Resources.h
+    src/code/ZepImGuiExCommand.cpp
+    src/code/ZepImGuiExCommand.h)
 
 if (APPLE)
   set(SOURCE_FILES ${SOURCE_FILES}
-      src/external/mac/FolderManager.mm
-      src/external/mac/FolderManager.h)
+      platform/FolderManager.mm
+      platform/FolderManager.h)
 endif ()
 
-if(MSVC)
+if (MSVC)
   set(SOURCE_FILES ${SOURCE_FILES}
-    platform/WinMainStub.cpp)
+      platform/WinMainStub.cpp)
 
   set(WINDOWS 1)
-endif()
+endif ()
 
 # App Icon
 AddIconToBinary(SOURCE_FILES ICONS ${CMAKE_SOURCE_DIR}/platform/dorito.ico ${CMAKE_SOURCE_DIR}/platform/dorito.icns)
@@ -170,8 +176,6 @@ elseif (APPLE)
   set_target_properties(${PROJECT_NAME} PROPERTIES
       MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/platform/Info.plist.in"
       )
-  #AddPlist(SOURCE_FILES PLIST ${CMAKE_SOURCE_DIR}/platform/Info.plist)
-
 else ()
   # To do - Add a desktop file for an icon and install stuff?
   add_executable(${PROJECT_NAME} ${SOURCE_FILES})
@@ -230,11 +234,11 @@ if (MSVC)
       $<TARGET_FILE:spdlog::spdlog>
       $<TARGET_FILE:fmt::fmt>
       DESTINATION . COMPONENT app)
-  install(DIRECTORY ${PROJECT_SOURCE_DIR}/assets  DESTINATION . COMPONENT app)
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/assets DESTINATION . COMPONENT app)
 
   set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}")
   set(CPACK_COMPONENTS_ALL app)
   set(CPACK_GENERATOR "ZIP")
   include(CPack)
-endif()
+endif ()
 

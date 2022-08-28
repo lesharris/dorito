@@ -9,6 +9,10 @@ namespace dorito {
 
   class EditorWidget : public Widget {
   public:
+    EditorWidget();
+
+    virtual ~EditorWidget();
+
     void Draw() override;
 
     std::string Name() override { return "Editor"; };
@@ -28,13 +32,24 @@ namespace dorito {
 
     void DeleteProgram();
 
+    void HighlightCurrent();
+
+    void CheckLineTarget();
+
+    bool HasActiveBuffer();
+
   private:
-    CodeEditor m_Editor{"Code.o8"};
-    Zep::ZepPath m_Path;
+    void HandleStepCPU(const Events::StepCPU &event);
+
+  private:
+    CodeEditor m_Editor;
+
     octo_program *m_Program = nullptr;
     bool m_CompiledSuccessfully = false;
-    bool m_PromptSave = false;
-    bool m_PromptSaveNew = false;
+    bool m_Stepped = false;
+
+    uint16_t m_LineTarget = 0;
+    bool m_LineTargetEnabled = false;
   };
 
 } // dorito
