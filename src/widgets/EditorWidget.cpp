@@ -17,6 +17,8 @@ namespace dorito {
         &EditorWidget::HandleStepCPU
     >(this);
 
+    m_Editor.BuildFonts();
+    
     auto &editor = m_Editor.GetEditor();
     editor.RegisterExCommand(std::make_shared<ZepImGuiExCommand>(editor));
   }

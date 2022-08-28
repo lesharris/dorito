@@ -59,7 +59,7 @@ namespace dorito {
     MonoFont = io.Fonts->AddFontFromFileTTF(monoFont.c_str(), 16.0f * dpi.y);
     io.Fonts->AddFontFromFileTTF(iconFont.c_str(), 18.0f * dpi.y, &icons_config, icons_ranges);
 
-    ImGuiFreeType::BuildFontAtlas(ImGui::GetIO().Fonts, ImGuiFreeTypeBuilderFlags_ForceAutoHint);
+    io.Fonts->Build();
 
     m_Widgets = std::vector<Ref<Widget>>{
         Widget::Create<MainMenuWidget>(),

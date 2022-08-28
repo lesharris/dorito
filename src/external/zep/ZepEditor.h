@@ -28,6 +28,8 @@ namespace dorito {
 
     void Draw();
 
+    void BuildFonts();
+
     virtual Zep::ZepEditor &GetEditor() const override final { return *m_editor; }
 
     void setText(const std::string &str) {

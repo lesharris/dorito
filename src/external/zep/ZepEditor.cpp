@@ -30,27 +30,6 @@ namespace dorito {
   }
 
   void CodeEditor::Draw() {
-    auto dpiScale = ImGui::GetWindowDpiScale();
-
-    if (!m_dpiScale.has_value() || (m_dpiScale.value() != dpiScale)) {
-      m_dpiScale = dpiScale;
-      auto &display = m_editor->GetDisplay();
-      display.SetPixelScale(Zep::NVec2f(dpiScale));
-
-      int fontPixelHeight = 18;
-      auto font = MonoFont;
-
-      display.SetFont(Zep::ZepTextType::UI, std::make_shared<Zep::ZepFont_ImGui>(display, font, fontPixelHeight));
-      display.SetFont(Zep::ZepTextType::Text, std::make_shared<Zep::ZepFont_ImGui>(display, font, fontPixelHeight));
-      display.SetFont(Zep::ZepTextType::Heading1,
-                      std::make_shared<Zep::ZepFont_ImGui>(display, font, int(fontPixelHeight * 1.75)));
-      display.SetFont(Zep::ZepTextType::Heading2,
-                      std::make_shared<Zep::ZepFont_ImGui>(display, font, int(fontPixelHeight * 1.5)));
-      display.SetFont(Zep::ZepTextType::Heading3,
-                      std::make_shared<Zep::ZepFont_ImGui>(display, font, int(fontPixelHeight * 1.25)));
-
-    }
-
     auto min = ImGui::GetCursorScreenPos();
     auto max = ImGui::GetContentRegionAvail();
     max.x = std::max(1.0f, max.x);
@@ -230,7 +209,7 @@ namespace dorito {
       }
     } else {
       // Don't blink the cursor if not focused.
-      m_editor->ResetCursorTimer();
+      //m_editor->ResetCursorTimer();
     }
   }
 
@@ -247,5 +226,28 @@ namespace dorito {
       // auto disp = m_editor->GetActiveWindow()->BufferToDisplay();
       //message->handled = false;
     }
+  }
+
+  void CodeEditor::BuildFonts() {
+    auto dpi = ImGui::GetWindowDpiScale();
+    auto &display = m_editor->GetDisplay();
+    auto &io = ImGui::GetIO();
+
+    display.SetPixelScale(Zep::NVec2f(dpi));
+
+    int fontPixelHeight = 18;
+    auto font = MonoFont;
+
+    display.SetFont(Zep::ZepTextType::UI, std::make_shared<Zep::ZepFont_ImGui>(display, font, fontPixelHeight));
+    display.SetFont(Zep::ZepTextType::Text, std::make_shared<Zep::ZepFont_ImGui>(display, font, fontPixelHeight));
+    display.SetFont(Zep::ZepTextType::Heading1,
+                    std::make_shared<Zep::ZepFont_ImGui>(display, font, int(fontPixelHeight * 1.75)));
+    display.SetFont(Zep::ZepTextType::Heading2,
+                    std::make_shared<Zep::ZepFont_ImGui>(display, font, int(fontPixelHeight * 1.5)));
+    display.SetFont(Zep::ZepTextType::Heading3,
+                    std::make_shared<Zep::ZepFont_ImGui>(display, font, int(fontPixelHeight * 1.25)));
+
+
+    io.Fonts->Build();
   }
 }
