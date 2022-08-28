@@ -19,6 +19,9 @@ namespace dorito {
                                        ImGuiTableFlags_BordersOuterH |
                                        ImGuiTableFlags_BordersOuterV |
                                        ImGuiTableFlags_RowBg)) {
+
+        ImGui::PushFont(MonoFont);
+
         auto &lines = cpu.m_Disassembly;
 
         ImGui::TableSetupColumn("Address", ImGuiTableColumnFlags_WidthFixed, 50.0f);
@@ -85,8 +88,8 @@ namespace dorito {
           }
         }
 
+        ImGui::PopFont();
         ImGui::EndTable();
-
       }
 
       if (!m_Enabled && wasEnabled) {

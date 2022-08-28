@@ -9,7 +9,11 @@ namespace dorito {
     if (m_Enabled) {
       static MemoryEditor memoryViewer;
 
-      memoryViewer.DrawWindow(ICON_FA_MEMORY " Memory", &bus.GetRam().GetMemory()[0], 1024 * 64);
+      ImGui::PushFont(MonoFont);
+      memoryViewer.DrawWindow(ICON_FA_MEMORY " Memory",
+                              &bus.GetRam().GetMemory()[0],
+                              1024 * 64);
+      ImGui::PopFont();
     }
   }
 } // dorito

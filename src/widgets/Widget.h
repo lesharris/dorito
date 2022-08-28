@@ -3,18 +3,21 @@
 #include <spdlog/spdlog.h>
 #include <fmt/format.h>
 #include <raylib.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 #include "common/common.h"
 
-#include "external/imgui/imgui.h"
 #include "external/imgui_extra/imgui_memory_editor.h"
-#include "imgui_internal.h"
 
 #include "system/Bus.h"
 #include "external/octo_compiler.h"
-#include "external/IconsFontAwesome5.h"
+#include "external/IconsFontAwesome6.h"
 
 namespace dorito {
+  extern ImFont *MainFont;
+  extern ImFont *MonoFont;
+  
   class Widget {
   public:
     Widget() = default;

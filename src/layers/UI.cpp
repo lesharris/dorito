@@ -2,14 +2,24 @@
 #include <raylib.h>
 
 #include "UI.h"
-#include "imgui_internal.h"
+
+#include <external/glfw/include/GLFW/glfw3.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/misc/freetype/imgui_freetype.h>
+
 #include "common/Resources.h"
 
 #include "system/Bus.h"
-#include "external/IconsFontAwesome5.h"
+#include "external/IconsFontAwesome6.h"
 
 namespace dorito {
   uint16_t UI::PrevPC = 0;
+
+  ImFont *MainFont = nullptr;
+  ImFont *MonoFont = nullptr;
 
   void UI::OnAttach() {
     ImGui::CreateContext(nullptr);
@@ -25,6 +35,7 @@ namespace dorito {
 
     auto &resourceManager = Resources::Get();
 
+    std::string mainFont = resourceManager.FontPath("SegoeUI.ttf");
     std::string monoFont = resourceManager.FontPath("CascadiaMono.ttf");
     std::string iconFont = resourceManager.FontPath("fa-solid-900.ttf");
 
@@ -34,15 +45,21 @@ namespace dorito {
 
     // Render fonts at half scale for sharper fonts.
     auto dpi = GetWindowScaleDPI();
-    io.Fonts->AddFontFromFileTTF(monoFont.c_str(), 16.0f * dpi.y);
+
+    io.FontGlobalScale = 1.0f / dpi.y;
 
     static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
     ImFontConfig icons_config;
     icons_config.MergeMode = true;
     icons_config.PixelSnapH = true;
-    io.Fonts->AddFontFromFileTTF(iconFont.c_str(), 16.0f * dpi.y, &icons_config, icons_ranges);
 
-    io.FontGlobalScale = 1.0f / dpi.y;
+    MainFont = io.Fonts->AddFontFromFileTTF(mainFont.c_str(), 18.0f * dpi.y);
+    io.Fonts->AddFontFromFileTTF(iconFont.c_str(), 18.0f * dpi.y, &icons_config, icons_ranges);
+
+    MonoFont = io.Fonts->AddFontFromFileTTF(monoFont.c_str(), 16.0f * dpi.y);
+    io.Fonts->AddFontFromFileTTF(iconFont.c_str(), 18.0f * dpi.y, &icons_config, icons_ranges);
+
+    ImGuiFreeType::BuildFontAtlas(ImGui::GetIO().Fonts, ImGuiFreeTypeBuilderFlags_ForceAutoHint);
 
     m_Widgets = std::vector<Ref<Widget>>{
         Widget::Create<MainMenuWidget>(),

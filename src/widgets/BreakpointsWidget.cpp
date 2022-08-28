@@ -15,6 +15,7 @@ namespace dorito {
     if (!ImGui::Begin(ICON_FA_CIRCLE " Breakpoints", &m_Enabled)) {
       ImGui::End();
     } else {
+      ImGui::PushFont(MonoFont);
       ImGui::BeginTable("breakpoints", 4, ImGuiTableFlags_RowBg);
       ImGui::TableSetupColumn("##1", ImGuiTableColumnFlags_WidthFixed, 30.0f);
       ImGui::TableSetupColumn("Name##2", ImGuiTableColumnFlags_WidthFixed, 50.0f);
@@ -51,6 +52,8 @@ namespace dorito {
       if (!m_Enabled && wasEnabled) {
         EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
       }
+
+      ImGui::PopFont();
 
       ImGui::End();
     }

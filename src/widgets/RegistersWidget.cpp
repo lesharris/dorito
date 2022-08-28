@@ -29,7 +29,7 @@ namespace dorito {
       ImGui::SameLine();
 
       if (!bus.Running()) {
-        if (ImGui::Button(ICON_FA_STEP_FORWARD " Step")) {
+        if (ImGui::Button(ICON_FA_FORWARD_STEP " Step")) {
           EventManager::Dispatcher().enqueue<Events::StepCPU>({});
         }
       }
@@ -58,6 +58,8 @@ namespace dorito {
       }
 
       ImGui::Separator();
+
+      ImGui::PushFont(MonoFont);
 
       ImGui::BeginTable("pci", 3, ImGuiTableFlags_RowBg);
       ImGui::TableSetupColumn("PC", ImGuiTableColumnFlags_None);
@@ -175,11 +177,14 @@ namespace dorito {
 
       ImGui::EndTable();
 
+      ImGui::PopFont();
+
       if (!m_Enabled && wasEnabled) {
         EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
       }
 
       ImGui::End();
     }
+
   }
 } // dorito

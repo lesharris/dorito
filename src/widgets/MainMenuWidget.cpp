@@ -107,7 +107,7 @@ namespace dorito {
         }
 
         ImGui::Separator();
-        if (ImGui::MenuItem(ICON_FA_SIGN_OUT_ALT " Quit", nullptr)) {
+        if (ImGui::MenuItem(ICON_FA_RIGHT_FROM_BRACKET " Quit", nullptr)) {
           EventManager::Dispatcher().trigger<Events::WantQuit>();
         }
 
@@ -122,13 +122,13 @@ namespace dorito {
 
         ImGui::Separator();
 
-        if (ImGui::MenuItem(ICON_FA_VOLUME_MUTE " Mute Dorito", nullptr, &m_DoritoMuted)) {
+        if (ImGui::MenuItem(ICON_FA_VOLUME_XMARK " Mute Dorito", nullptr, &m_DoritoMuted)) {
           EventManager::Dispatcher().enqueue(Events::SetMute(m_DoritoMuted));
         }
 
         ImGui::Separator();
 
-        if (ImGui::BeginMenu(ICON_FA_TACHOMETER_ALT " Speed")) {
+        if (ImGui::BeginMenu(ICON_FA_GAUGE_HIGH " Speed")) {
           for (auto &entry: m_CycleEntries) {
             if (entry.cycles == 0) {
               ImGui::Separator();
@@ -235,7 +235,7 @@ namespace dorito {
           EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("Editor");
         }
         ImGui::Separator();
-        if (ImGui::MenuItem(ICON_FA_PAINT_BRUSH " Sprite Editor", nullptr, status["SpriteEditor"])) {
+        if (ImGui::MenuItem(ICON_FA_PAINTBRUSH " Sprite Editor", nullptr, status["SpriteEditor"])) {
           EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("SpriteEditor");
         }
 
@@ -245,7 +245,7 @@ namespace dorito {
 
         ImGui::Separator();
 
-        if (ImGui::MenuItem(ICON_FA_SEARCH " Monitors", nullptr, status["MonitorsWidget"])) {
+        if (ImGui::MenuItem(ICON_FA_MAGNIFYING_GLASS " Monitors", nullptr, status["MonitorsWidget"])) {
           EventManager::Dispatcher().enqueue<Events::UIToggleEnabled>("MonitorsWidget");
         }
 
@@ -297,6 +297,8 @@ namespace dorito {
 
     if (ImGui::BeginPopupModal("About Dorito...", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)) {
 
+      ImGui::PushFont(MonoFont);
+
       auto &app = Dorito::Get();
       auto &logo = app.GetLogoTexture();
 
@@ -331,6 +333,7 @@ namespace dorito {
 
       ImGui::Dummy({0.0f, 10.0f});
 
+      ImGui::PopFont();
       ImGui::EndPopup();
     }
   }

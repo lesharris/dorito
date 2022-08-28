@@ -4,17 +4,13 @@
 #include <vector>
 #include <map>
 
+#include <imgui/imgui.h>
+
 #include "common/common.h"
 #include "core/Dorito.h"
 
 #include "core/events/EventManager.h"
 #include "core/layers/GameLayer.h"
-
-#include "external/glfw/include/GLFW/glfw3.h"
-
-#include "external/imgui/imgui.h"
-#include "external/imgui/backends/imgui_impl_opengl3.h"
-#include "external/imgui/backends/imgui_impl_glfw.h"
 
 #include "system/Bus.h"
 

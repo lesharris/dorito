@@ -15,6 +15,7 @@ namespace dorito {
     if (!ImGui::Begin(ICON_FA_HEADPHONES " Audio", &m_Enabled)) {
       ImGui::End();
     } else {
+      ImGui::PushFont(MonoFont);
       ImGui::BeginTable("pitch", 1, ImGuiTableFlags_RowBg);
       ImGui::TableSetupColumn("Pitch", ImGuiTableColumnFlags_None);
 
@@ -69,16 +70,18 @@ namespace dorito {
 
       auto bits = patternToBits(buffer);
 
-      ImGui::PlotLines("Waveform",
+      auto region = ImGui::GetContentRegionAvail();
+      ImGui::PlotLines("##waveform",
                        &bits[0], 512,
                        0, nullptr, -0.2f, 1.2f,
-                       ImVec2(0, 100.0f));
+                       ImVec2(region.x, 100.0f));
 
 
       if (!m_Enabled && wasEnabled) {
         EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
       }
 
+      ImGui::PopFont();
       ImGui::End();
     }
   }

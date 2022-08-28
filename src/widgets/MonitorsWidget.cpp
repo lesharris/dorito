@@ -27,9 +27,11 @@ namespace dorito {
 
     ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin(ICON_FA_SEARCH " Monitors", &m_Enabled)) {
+    if (!ImGui::Begin(ICON_FA_MAGNIFYING_GLASS " Monitors", &m_Enabled)) {
       ImGui::End();
     } else {
+
+      ImGui::PushFont(MonoFont);
 
       ImGui::BeginTable("monitors", 2, ImGuiTableFlags_RowBg);
       ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 100.0f);
@@ -97,6 +99,8 @@ namespace dorito {
         EventManager::Dispatcher().enqueue<Events::SaveAppPrefs>();
       }
 
+      ImGui::PopFont();
+      
       ImGui::End();
     }
   }

@@ -168,13 +168,13 @@ namespace dorito {
 
     ImGui::SameLine();
 
-    if (ImGui::Button(ICON_FA_ANGLE_DOUBLE_LEFT)) {
+    if (ImGui::Button(ICON_FA_ANGLES_LEFT)) {
       std::rotate(m_Pattern.begin(), m_Pattern.begin() + 1, m_Pattern.end());
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button(ICON_FA_ANGLE_DOUBLE_RIGHT)) {
+    if (ImGui::Button(ICON_FA_ANGLES_RIGHT)) {
       std::rotate(m_Pattern.rbegin(), m_Pattern.rbegin() + 1, m_Pattern.rend());
     }
 

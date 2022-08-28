@@ -9,7 +9,7 @@ namespace dorito {
     bool wasEnabled = m_Enabled;
     ImGui::SetNextWindowSize({400, 350}, ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin(ICON_FA_PAINT_BRUSH " Sprite Editor", &m_Enabled)) {
+    if (!ImGui::Begin(ICON_FA_PAINTBRUSH " Sprite Editor", &m_Enabled)) {
       ImGui::End();
     } else {
 
@@ -60,7 +60,7 @@ namespace dorito {
 
     ImGui::SameLine();
 
-    if (ImGui::Button(ICON_FA_ANGLE_DOUBLE_LEFT)) {
+    if (ImGui::Button(ICON_FA_ANGLES_LEFT)) {
       for (auto layer = 0; layer < 2; layer++) {
         auto firstColumn = ReadColumn(layer, 0);
 
@@ -75,7 +75,7 @@ namespace dorito {
 
     ImGui::SameLine();
 
-    if (ImGui::Button(ICON_FA_ANGLE_DOUBLE_RIGHT)) {
+    if (ImGui::Button(ICON_FA_ANGLES_RIGHT)) {
       for (auto layer = 0; layer < 2; layer++) {
         auto lastColumn = ReadColumn(layer, hiresSprite ? 15 : 7);
 
@@ -90,7 +90,7 @@ namespace dorito {
 
     ImGui::SameLine();
 
-    if (ImGui::Button(ICON_FA_ANGLE_DOUBLE_UP)) {
+    if (ImGui::Button(ICON_FA_ANGLES_UP)) {
       for (auto layer = 0; layer < 2; layer++) {
         auto firstRow = ReadRow(layer, 0);
 
@@ -105,7 +105,7 @@ namespace dorito {
 
     ImGui::SameLine();
 
-    if (ImGui::Button(ICON_FA_ANGLE_DOUBLE_DOWN)) {
+    if (ImGui::Button(ICON_FA_ANGLES_DOWN)) {
       for (auto layer = 0; layer < 2; layer++) {
         auto lastRow = ReadRow(layer, 15);
 
