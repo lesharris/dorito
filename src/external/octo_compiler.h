@@ -17,9 +17,6 @@
 *  https://github.com/JohnEarnest/c-octo/blob/main/src/octo_compiler.h
 **/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +24,9 @@ extern "C" {
 #include <ctype.h>
 #include <math.h>
 
+#include <map>
+#include <vector>
+#include <string>
 /**
 *
 *  Fundamental Data Structures
@@ -64,6 +64,7 @@ typedef struct {
 typedef struct {
   int value;
 } octo_reg;
+
 typedef struct {
   int value;
   char is_long;
@@ -114,6 +115,13 @@ typedef struct {
   octo_list values;
 } octo_stack;
 
+struct octo_listing_item {
+  int line;
+  int pos;
+  int addr;
+  uint16_t data;
+};
+
 typedef struct {
   // string interning table
   size_t strings_used;
@@ -125,6 +133,8 @@ typedef struct {
   int source_line;
   int source_pos;
   octo_list tokens;
+
+  octo_tok *current_token;
 
   // compiler
   char has_main;    // do we need a trampoline for 'main'?
@@ -150,6 +160,10 @@ typedef struct {
   char error[OCTO_ERR_MAX];
   int error_line;
   int error_pos;
+
+  // Listing
+  std::map<uint16_t, octo_listing_item> *listing;
+
 } octo_program;
 
 void octo_free_program(octo_program *p);
@@ -159,7 +173,3 @@ octo_program *octo_compile_str(char *text);
 void *octo_map_get(octo_map *map, char *key);
 
 void *octo_map_set(octo_map *map, char *key, void *value);
-
-#ifdef __cplusplus
-}
-#endif
