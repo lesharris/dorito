@@ -8,6 +8,11 @@
 namespace dorito {
 
   class EditorWidget : public Widget {
+    enum class PromptSaveAction {
+      None,
+      Close
+    };
+
   public:
     EditorWidget();
 
@@ -38,11 +43,16 @@ namespace dorito {
 
     bool HasActiveBuffer();
 
+    void CloseTabWindow();
+
   private:
     void HandleStepCPU(const Events::StepCPU &event);
 
   private:
     CodeEditor m_Editor;
+
+    bool m_PromptSave = false;
+    PromptSaveAction m_PromptSaveAction = PromptSaveAction::None;
 
     octo_program *m_Program = nullptr;
     bool m_CompiledSuccessfully = false;
@@ -50,6 +60,7 @@ namespace dorito {
 
     uint16_t m_LineTarget = 0;
     bool m_LineTargetEnabled = false;
+
   };
 
 } // dorito

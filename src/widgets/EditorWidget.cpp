@@ -8,6 +8,8 @@
 #include "code/ZepImGuiExCommand.h"
 #include "code/BreakpointEditorWidget.h"
 
+#include "external/imgui_colored_button.h"
+
 namespace dorito {
   EditorWidget::EditorWidget() {
     EventManager::Get().Attach<
@@ -73,10 +75,17 @@ namespace dorito {
 
           if (ImGui::MenuItem("Close", nullptr, false, HasActiveBuffer())) {
             auto &editor = m_Editor.GetEditor();
-            editor.RemoveTabWindow(editor.GetActiveTabWindow());
+            auto dirty = editor.GetActiveBuffer()->HasFileFlags(Zep::FileFlags::Dirty);
+
+            if (dirty) {
+              m_PromptSave = true;
+              m_PromptSaveAction = PromptSaveAction::Close;
+            } else {
+              CloseTabWindow();
+            }
           }
 
-          if (ImGui::MenuItem(ICON_FA_SAVE " Save", nullptr, false, HasActiveBuffer())) {
+          if (ImGui::MenuItem(ICON_FA_FLOPPY_DISK " Save", nullptr, false, HasActiveBuffer())) {
             SaveFile();
           }
 
@@ -97,7 +106,7 @@ namespace dorito {
 
           ImGui::Separator();
 
-          if (ImGui::MenuItem(ICON_FA_COG " Compile", nullptr, false, HasActiveBuffer())) {
+          if (ImGui::MenuItem(ICON_FA_GEAR " Compile", nullptr, false, HasActiveBuffer())) {
             if (SaveFile()) {
               if (Compile()) {
                 EventManager::Dispatcher().enqueue<Events::LoadCode>(m_Program->rom);
@@ -117,7 +126,10 @@ namespace dorito {
         ImGui::Dummy({10.0f, 0.0});
         ImGui::SameLine();
 
-        if (ImGui::Button(bus.Running() ? ICON_FA_PAUSE " Pause" : ICON_FA_PLAY " Run")) {
+        if (ImGui::ColoredButtonV1(bus.Running() ? ICON_FA_PAUSE " Pause " : ICON_FA_PLAY " Run ", ImVec2(0.0f, 0.0f),
+                                   IM_COL32(255, 255, 255, 255),
+                                   bus.Running() ? IM_COL32(200, 60, 60, 255) : IM_COL32(50, 220, 60, 255),
+                                   bus.Running() ? IM_COL32(180, 40, 90, 255) : IM_COL32(69, 150, 70, 255))) {
 
           if (!bus.Running()) {
             if (SaveFile()) {
@@ -137,7 +149,7 @@ namespace dorito {
         ImGui::SameLine();
 
         if (!bus.Running()) {
-          if (ImGui::Button(ICON_FA_STEP_FORWARD " Step")) {
+          if (ImGui::Button(ICON_FA_FORWARD_STEP " Step ")) {
             EventManager::Dispatcher().enqueue<Events::StepCPU>({});
           }
         }
@@ -146,7 +158,7 @@ namespace dorito {
         ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
         ImGui::SameLine();
 
-        if (ImGui::Button(ICON_FA_STEP_BACKWARD " Reset")) {
+        if (ImGui::Button(ICON_FA_BACKWARD_STEP " Reset ")) {
           m_Stepped = false;
           m_LineTarget = 0;
           m_Editor.GetEditor().GetActiveBuffer()->ClearRangeMarkers(Zep::RangeMarkerType::All);
@@ -157,7 +169,7 @@ namespace dorito {
         ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
         ImGui::SameLine();
 
-        if (ImGui::Button(ICON_FA_COG " Compile")) {
+        if (ImGui::Button(ICON_FA_GEAR " Compile ")) {
           if (SaveFile()) {
             if (Compile()) {
               m_Stepped = false;
@@ -192,7 +204,9 @@ namespace dorito {
 
       m_Editor.Draw();
 
-      //ImGui::OpenPopup("Save current file?");
+      if (m_PromptSave) {
+        ImGui::OpenPopup("Save current file?");
+      }
 
       ConfirmSave();
 
@@ -426,24 +440,40 @@ namespace dorito {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
+    auto ExecutePromptAction = [&]() {
+      switch (m_PromptSaveAction) {
+        case PromptSaveAction::None:
+          break;
+        case PromptSaveAction::Close:
+          CloseTabWindow();
+          break;
+      }
+
+      m_PromptSave = false;
+      m_PromptSaveAction = PromptSaveAction::None;
+    };
+
     if (ImGui::BeginPopupModal("Save current file?", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
       ImGui::Text("Do you want to save the current file?");
       ImGui::Separator();
 
       if (ImGui::Button("Yes", ImVec2(120, 0))) {
-        SaveFile();
-        ImGui::CloseCurrentPopup();
+        if (SaveFile()) {
+          ExecutePromptAction();
+          ImGui::CloseCurrentPopup();
+        }
       }
+
       ImGui::SetItemDefaultFocus();
       ImGui::SameLine();
 
       if (ImGui::Button("No", ImVec2(120, 0))) {
+        ExecutePromptAction();
         ImGui::CloseCurrentPopup();
       }
 
       ImGui::EndPopup();
     }
-
   }
 
   void EditorWidget::DeleteProgram() {
@@ -553,4 +583,13 @@ namespace dorito {
 
     return editor.GetActiveBuffer() != nullptr;
   }
+
+  void EditorWidget::CloseTabWindow() {
+    auto &editor = m_Editor.GetEditor();
+
+    if (editor.GetActiveTabWindow()) {
+      editor.RemoveTabWindow(editor.GetActiveTabWindow());
+    }
+  }
+
 } // dorito
