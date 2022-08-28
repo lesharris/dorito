@@ -64,6 +64,7 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(unofficial-nativefiledialog CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(freetype CONFIG REQUIRED)
 
 # Source Files
 set(SOURCE_FILES
@@ -138,14 +139,18 @@ set(SOURCE_FILES
     src/widgets/MonitorsWidget.h
     src/widgets/BreakpointsWidget.cpp
     src/widgets/BreakpointsWidget.h
-    src/external/IconsFontAwesome5.h
     src/external/imgui-knobs.cpp
     src/code/BreakpointEditorWidget.h
     src/code/BreakpointEditorWidget.cpp
     src/common/Resources.cpp
     src/common/Resources.h
     src/code/ZepImGuiExCommand.cpp
-    src/code/ZepImGuiExCommand.h)
+    src/code/ZepImGuiExCommand.h
+    src/external/IconsFontAwesome6.h
+    src/external/imgui_colored_button.cpp
+    src/external/imgui_colored_button.h
+    src/external/imgui/misc/freetype/imgui_freetype.h
+    src/external/imgui/misc/freetype/imgui_freetype.cpp)
 
 if (APPLE)
   set(SOURCE_FILES ${SOURCE_FILES}
@@ -169,6 +174,7 @@ if (MSVC)
 elseif (APPLE)
   AddFont(SOURCE_FILES FONT ${CMAKE_SOURCE_DIR}/assets/fonts/CascadiaMono.ttf)
   AddFont(SOURCE_FILES FONT ${CMAKE_SOURCE_DIR}/assets/fonts/fa-solid-900.ttf)
+  AddFont(SOURCE_FILES FONT ${CMAKE_SOURCE_DIR}/assets/fonts/SegoeUI.ttf)
   AddPNG(SOURCE_FILES PNG ${CMAKE_SOURCE_DIR}/assets/dorito.png)
 
   add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCE_FILES})
@@ -213,6 +219,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     EnTT::EnTT
     unofficial::nativefiledialog::nfd
     nlohmann_json::nlohmann_json
+    freetype
     Zep::Zep)
 
 if (APPLE)
@@ -233,6 +240,7 @@ if (MSVC)
   install(FILES
       $<TARGET_FILE:spdlog::spdlog>
       $<TARGET_FILE:fmt::fmt>
+      $<TARGET_FILE:freetype>
       DESTINATION . COMPONENT app)
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/assets DESTINATION . COMPONENT app)
 

@@ -2,12 +2,14 @@
 
 #include <GLFW/glfw3.h>
 
-#include "zep/regress.h"
 #include "zep/imgui/display_imgui.h"
+#include "imgui/misc/freetype/imgui_freetype.h"
 
 #include "code/ZepSyntaxOcto.h"
 
 namespace dorito {
+  extern ImFont *MonoFont;
+
   CodeEditor::CodeEditor()
       : m_editor(std::make_unique<Zep::ZepEditor>(
       new Zep::ZepDisplay_ImGui(),
@@ -36,7 +38,7 @@ namespace dorito {
       display.SetPixelScale(Zep::NVec2f(dpiScale));
 
       int fontPixelHeight = 18;
-      auto font = ImGui::GetFont();
+      auto font = MonoFont;
 
       display.SetFont(Zep::ZepTextType::UI, std::make_shared<Zep::ZepFont_ImGui>(display, font, fontPixelHeight));
       display.SetFont(Zep::ZepTextType::Text, std::make_shared<Zep::ZepFont_ImGui>(display, font, fontPixelHeight));
@@ -46,6 +48,7 @@ namespace dorito {
                       std::make_shared<Zep::ZepFont_ImGui>(display, font, int(fontPixelHeight * 1.5)));
       display.SetFont(Zep::ZepTextType::Heading3,
                       std::make_shared<Zep::ZepFont_ImGui>(display, font, int(fontPixelHeight * 1.25)));
+
     }
 
     auto min = ImGui::GetCursorScreenPos();
