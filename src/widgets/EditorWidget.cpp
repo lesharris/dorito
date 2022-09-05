@@ -18,7 +18,7 @@ namespace dorito {
     >(this);
 
     m_Editor.BuildFonts();
-    
+
     auto &editor = m_Editor.GetEditor();
     editor.RegisterExCommand(std::make_shared<ZepImGuiExCommand>(editor));
   }
@@ -150,21 +150,41 @@ namespace dorito {
 
         ImGui::SameLine();
 
+        if (!m_CompiledSuccessfully) {
+          ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+          ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+        }
+
         if (!bus.Running()) {
           if (ImGui::Button(ICON_FA_FORWARD_STEP " Step ")) {
             EventManager::Dispatcher().enqueue<Events::StepCPU>({});
           }
         }
 
+        if (!m_CompiledSuccessfully) {
+          ImGui::PopItemFlag();
+          ImGui::PopStyleVar();
+        }
+
         ImGui::SameLine();
         ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
         ImGui::SameLine();
+
+        if (!m_CompiledSuccessfully) {
+          ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+          ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+        }
 
         if (ImGui::Button(ICON_FA_BACKWARD_STEP " Reset ")) {
           m_Stepped = false;
           m_LineTarget = 0;
           m_Editor.GetEditor().GetActiveBuffer()->ClearRangeMarkers(Zep::RangeMarkerType::All);
           EventManager::Dispatcher().enqueue<Events::Reset>();
+        }
+
+        if (!m_CompiledSuccessfully) {
+          ImGui::PopItemFlag();
+          ImGui::PopStyleVar();
         }
 
         ImGui::SameLine();
@@ -181,11 +201,12 @@ namespace dorito {
             }
           }
         }
-        //  ImGui::SameLine();
-        // ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+
+        //ImGui::SameLine();
+        //ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
         //ImGui::SameLine();
 
-        /*    ImGui::Text("Run to line: ");
+        /*  ImGui::Text("Run to line: ");
             ImGui::SameLine();
             ImGui::PushItemWidth(50.0f);
             ImGui::InputScalar("##", ImGuiDataType_U16, &m_LineTarget, nullptr, nullptr, "%d");

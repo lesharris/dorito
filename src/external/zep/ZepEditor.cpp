@@ -21,7 +21,7 @@ namespace dorito {
 
     auto &config = m_editor->GetConfig();
     config.autoHideCommandRegion = false;
-    config.showNormalModeKeyStrokes = false;
+    config.showNormalModeKeyStrokes = true;
 
     ZepSyntaxOcto::registerSyntax(m_editor);
 
@@ -30,6 +30,13 @@ namespace dorito {
   }
 
   void CodeEditor::Draw() {
+    auto dpiScale = ImGui::GetWindowDpiScale();
+
+    if (!m_dpiScale.has_value() || (m_dpiScale.value() != dpiScale)) {
+      m_dpiScale = dpiScale;
+      BuildFonts();
+    }
+
     auto min = ImGui::GetCursorScreenPos();
     auto max = ImGui::GetContentRegionAvail();
     max.x = std::max(1.0f, max.x);
@@ -233,6 +240,8 @@ namespace dorito {
     auto &display = m_editor->GetDisplay();
     auto &io = ImGui::GetIO();
 
+    m_dpiScale = dpi;
+
     display.SetPixelScale(Zep::NVec2f(dpi));
 
     int fontPixelHeight = 18;
@@ -246,8 +255,5 @@ namespace dorito {
                     std::make_shared<Zep::ZepFont_ImGui>(display, font, int(fontPixelHeight * 1.5)));
     display.SetFont(Zep::ZepTextType::Heading3,
                     std::make_shared<Zep::ZepFont_ImGui>(display, font, int(fontPixelHeight * 1.25)));
-
-
-    io.Fonts->Build();
   }
 }
